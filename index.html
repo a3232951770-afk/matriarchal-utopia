@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriarchal Utopia - World Invitation & Creation</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fabric.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+
+    <!-- Firebase SDKs (Compat version for simple HTML usage) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Storage SDK removed as we are using Firestore for images now -->
+    <!-- <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script> -->
+
+    <!-- CSS Reset & Styles -->
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; background-color: #1c1917; font-family: 'Georgia', serif; }
+        .animate-unfold { animation: unfold 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-slide-up { animation: slideUp 0.5s ease-out forwards; }
+        .animate-slide-left { animation: slideLeft 0.5s ease-out forwards; }
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+        .animate-pulse-slow { animation: pulseSlow 3s infinite; }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        
+        @keyframes unfold { 0% { transform: scaleY(0); opacity: 0; } 100% { transform: scaleY(1); opacity: 1; } }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        @keyframes slideLeft { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulseSlow { 0%, 100% { opacity: 0.1; } 50% { opacity: 0.3; } }
+        @keyframes float { 0% { transform: translate(-50%, -50%) translateY(0px); } 50% { transform: translate(-50%, -50%) translateY(-20px); } 100% { transform: translate(-50%, -50%) translateY(0px); } }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #a8a29e; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #78350f; }
+        
+        /* New Aesthetic Classes */
+        .glass-panel { background: rgba(255, 251, 242, 0.95); backdrop-filter: blur(8px); border: 1px solid rgba(120, 53, 15, 0.2); }
+        .text-shadow-sm { text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .secret-stamp { 
+            border: 3px solid #be123c; 
+            color: #be123c; 
+            padding: 0.2rem 0.5rem; 
+            text-transform: uppercase; 
+            font-weight: bold; 
+            letter-spacing: 0.1em;
+            display: inline-block;
+            transform: rotate(-5deg);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // ============================================================================
+        // ⚙️ Configuration & Firebase Init
+        // ============================================================================
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDK7lm6c2Xbguh-5alGb0Y4vw1EHrJWuOA",
+            authDomain: "matriarchal-utopian-society.firebaseapp.com",
+            projectId: "matriarchal-utopian-society",
+            storageBucket: "matriarchal-utopian-society.firebasestorage.app",
+            messagingSenderId: "718012857553",
+            appId: "1:718012857553:web:0759032af412dee1c199f0",
+            measurementId: "G-0WJENQGEMN"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+        // Storage is no longer needed since we are saving Base64 to Firestore
+        // const storage = firebase.storage(); 
+        const auth = firebase.auth();
+
+        // Ensure anonymous auth for database access
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                auth.signInAnonymously().catch(console.error);
+            }
+        });
+
+        const { useState, useRef, useEffect, useMemo } = React;
+        
+        // ============================================================================
+        // 🔧 Icons
+        // ============================================================================
+        
+        const Icon = ({ children, size = 24, className = "", strokeWidth = 2, ...props }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+                {children}
+            </svg>
+        );
+        const X = (p) => <Icon {...p}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></Icon>;
+        const Activity = (p) => <Icon {...p}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></Icon>;
+        const Heart = (p) => <Icon {...p}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></Icon>;
+        const Eye = (p) => <Icon {...p}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></Icon>;
+        const MapIcon = (p) => <Icon {...p}><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></Icon>;
+        const Home = (p) => <Icon {...p}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></Icon>;
+        const MapPin = (p) => <Icon {...p}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></Icon>;
+        const ZoomIn = (p) => <Icon {...p}><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></Icon>;
+        const ZoomOut = (p) => <Icon {...p}><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" x2="14" y1="11" y2="11"/></Icon>;
+        const Globe = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></Icon>;
+        const UserPlus = (p) => <Icon {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" x2="20" y1="8" y2="14"/><line x1="23" x2="17" y1="11" y2="11"/></Icon>;
+        const MessageSquare = (p) => <Icon {...p}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></Icon>;
+        const ArrowUp = (p) => <Icon {...p}><line x1="12" x2="12" y1="19" y2="5"/><polyline points="5 12 12 5 19 12"/></Icon>;
+        const ArrowDown = (p) => <Icon {...p}><line x1="12" x2="12" y1="5" y2="19"/><polyline points="19 12 12 19 5 12"/></Icon>;
+        const Trash = (p) => <Icon {...p}><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></Icon>;
+
+        // ============================================================================
+        // 🔴 Assets Configuration
+        // ============================================================================
+
+        const IMG_MAP_BG = "https://i.postimg.cc/fRzdtqSp/wei-xin-tu-pian-20260122205350-729-2865.png";
+        const IMG_MAP_BACKUP = "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2074&auto=format&fit=crop";
+        const IMG_HOME_BG = "https://i.postimg.cc/hGCRfdBQ/wei-xin-tu-pian-20260123135820-850-2865.jpg";
+        
+        // NPC Images
+        const IMG_NPC_BIRD = "https://i.postimg.cc/9MLxqwJs/图层_2.png"; 
+        const IMG_NPC_HORSE = "https://i.postimg.cc/ZRwfyvVG/图层_3.png"; 
+        const IMG_NPC_FISH = "https://i.postimg.cc/j5M8JnZm/图层_1.png"; 
+        const IMG_NPC_SOL = "https://i.postimg.cc/nz3dQ906/图层_4.png"; 
+        
+        const IMG_NEWSPAPER = "https://i.postimg.cc/NG64NwMn/oc-1.jpg";
+
+        // Flags
+        const FLAG_BIRD = "https://i.postimg.cc/XJKtSBYm/羽择国旗帜_yi.png";
+        const FLAG_ORCA = "https://i.postimg.cc/nzKNb9hN/忆行国旗帜_1.png";
+        const FLAG_HYENA = "https://i.postimg.cc/qRcWV67f/裂识国旗帜_2.png";
+        
+        const BODY_SHAPES = {
+            female: {
+                f1: "https://i.postimg.cc/Zqr0wrNb/图层_1.png",
+                f2: "https://i.postimg.cc/fbxk8xdT/图层_2.png",
+                f3: "https://i.postimg.cc/MGyX9yBZ/图层_3.png",
+                f4: "https://i.postimg.cc/QMpVfp7d/图层_4.png",
+                f5: "https://i.postimg.cc/d08D58C1/图层_5.png",
+                f6: "https://i.postimg.cc/HLQj6QMn/图层_6.png",
+                f7: "https://i.postimg.cc/bvQdmQnv/图层_7.png",
+                f8: "https://i.postimg.cc/xdKq6Kmc/图层_8.png",
+                f9: "https://i.postimg.cc/Zqr0wrN9/图层_9.png",
+                f10: "https://i.postimg.cc/fbxk8xdm/图层_10.png",
+                f11: "https://i.postimg.cc/QMpVfp77/图层_11.png",
+                f12: "https://i.postimg.cc/5twjswzQ/图层_12.png"
+            },
+            male: {
+                m12: "https://i.postimg.cc/5twjswzQ/图层_12.png",
+                m13: "https://i.postimg.cc/tJDBWZkF/图层_13.png",
+                m14: "https://i.postimg.cc/5ypsLYgL/图层_14.png",
+                m15: "https://i.postimg.cc/J0KpZDx3/图层_15.png",
+                m16: "https://i.postimg.cc/ZnjwpBHH/图层_16.png",
+                m17: "https://i.postimg.cc/J0KpZDxQ/图层_17.png",
+                m18: "https://i.postimg.cc/cCTFwghM/图层_18.png",
+                m19: "https://i.postimg.cc/FzGT3dpZ/图层_19.png",
+                m21: "https://i.postimg.cc/RhCRSCmc/图层_21.png",
+                m22: "https://i.postimg.cc/NFG4sGtR/图层_22.png",
+                m23: "https://i.postimg.cc/5y9349JB/图层_23.png",
+                m24: "https://i.postimg.cc/d3QBsQFR/图层_24.png",
+                m25: "https://i.postimg.cc/Gt3QL3RJ/图层_25.png"
+            }
+        };
+
+        const COLLAGE_ASSETS = {
+            parts: [
+                "https://i.postimg.cc/gj0V9Myy/2.png", "https://i.postimg.cc/rsp16hG9/3.png", "https://i.postimg.cc/Rh07rP1Q/4.png",
+                "https://i.postimg.cc/hvGLFC81/5.png", "https://i.postimg.cc/MHG7ks0D/6.png", "https://i.postimg.cc/tJg30rdk/7.png",
+                "https://i.postimg.cc/wMBXKW5F/8.png", "https://i.postimg.cc/NF06hN8N/图层_1.png", "https://i.postimg.cc/SN5nKpYR/123.png",
+                "https://i.postimg.cc/L67JsMYx/23.png", "https://i.postimg.cc/yYWJBNd2/33.png", "https://i.postimg.cc/GhN4p18z/34.png",
+                "https://i.postimg.cc/NfLyY0MW/35.png", "https://i.postimg.cc/9FSDfjRv/36.png", "https://i.postimg.cc/qMYN7d60/55.png",
+                "https://i.postimg.cc/tCfsgHn9/76.png", "https://i.postimg.cc/SN5nKpYQ/78.png", "https://i.postimg.cc/x8B99npr/2345.png",
+                "https://i.postimg.cc/kGL77q10/啊.png", "https://i.postimg.cc/CM2hGshK/图层_2.png", "https://i.postimg.cc/qBFJsxJR/有.png"
+            ]
+        };
+        
+        // ============================================================================
+        // 💬 Dialogue Script Data (Bilingual)
+        // ============================================================================
+
+        const NPC_DIALOGUES = {
+            zh: {
+                // Ⅰ｜羽择国 (Bird)
+                'b1': { 
+                    start: "看看这满地的羽毛。每一根都是他们在台上的誓言。男孩们负责闪耀，而我负责把这些闪耀编织成能踩在脚下的地板。",
+                    options: [
+                        { id: 1, text: "你不觉得扫地很烦吗？", reply: "烦？也许吧。但如果没人收拾这些漂亮的废话，我们的巢穴早就塌了。我欣赏他们的努力，只要他们别指望光靠漂亮就能养活孩子。" },
+                        { id: 2, text: "为什么还要看他们表演？", reply: "因为这是契约。他们展示脆弱和美丽，我展示评估和承担。在这个国家，被看的一方其实是在交出权力，而看的人由于手握权力，必须仁慈。" },
+                        { id: 3, text: "你最看重什么？", reply: "不是飞得最高的，而是落地最稳的。风停的时候，才看得出谁是真的爱这个家，谁只是爱表现。" }
+                    ]
+                },
+                'b2': { 
+                    start: "我调了三个小时的颜色。主母说上一季的蓝色太具侵略性了，这次我加了一点灰度。你觉得这看起来是‘可靠’，还是仅仅是‘虚荣’？",
+                    options: [
+                        { id: 1, text: "我觉得很美。", reply: "谢谢。但在羽择国，美如果不伴随功能，就是浪费。我希望我的美能让她觉得……我是那种可以一起抵御暴风雨的伙伴。" },
+                        { id: 2, text: "为什么要这么在意她们的看法？", reply: "因为她们的眼睛是尺。她们能看穿羽毛下的肌肉是否紧绷。听取她们的建议让我变得更好，这不是顺从，这是进化。" },
+                        { id: 3, text: "如果不被选中呢？", reply: "那就去教小鸟飞。如果不做主角，做个好观众也是对这个世界的贡献。而且，这颜色我自己看着也挺开心的。" }
+                    ]
+                },
+                'b3': { 
+                    start: "来杯茶吗？刚下来的那个男孩哭得很大声。他以为只要心够诚，风向就会变。可惜，爱和物理学一样，不靠感动运行。",
+                    options: [
+                        { id: 1, text: "你会安慰他吗？", reply: "我不骗他。我会告诉他：‘你的羽毛很美，只是不适合这棵树。’ 女性之间的仁慈不是撒谎，而是告诉他真相，然后给他倒杯热茶。" },
+                        { id: 2, text: "这里总是这么残酷？", reply: "选择总是残酷的。但不选择更残酷——那是对所有人的不负责。我们挑选，是为了让后代有更好的翅膀。这不是针对个人。" },
+                        { id: 3, text: "你自己呢？", reply: "我？我是那个在后台把灯光调暗的人。让赢家不至于太骄傲，输家不至于太难堪。这也是一种‘照护’，对吧？" }
+                    ]
+                },
+                // Ⅱ｜裂识国 (Hyena)
+                'h1': { 
+                    start: "你站的位置是死角。如果现在有袭击，你会是防线上第一个裂口。往左移三步。我们不靠拥抱来保护彼此，我们靠站位。",
+                    options: [
+                        { id: 1, text: "太严格了吧。", reply: "松弛是留给死人的特权。在这个国家，‘爱’的意思就是我不允许你犯错而死掉。我的严厉是你活命的保障。" },
+                        { id: 2, text: "大家都听你的吗？", reply: "她们听的是‘逻辑’。如果不听我的能让效率提高 1%，我会立刻闭嘴让位。这里没有女王，只有最优解。" },
+                        { id: 3, text: "你累不累？", reply: "系统运转不需要‘累’这种情绪。只需要润滑油。只要看到防线完整，我就感觉不到累。" }
+                    ]
+                },
+                'h2': { 
+                    start: "……气压降了。十分钟后有暴雨。我的膝盖比雷达先知道。你需要掩护吗？",
+                    options: [
+                        { id: 1, text: "你怎么知道的？", reply: "身体是最好的传感器。很多人忽视身体的噪音，但在裂识国，我们把身体练成精密的仪器。痛觉是信号，不是折磨。" },
+                        { id: 2, text: "你看起来很冷漠。", reply: "因为多余的情绪会干扰信号接收。我不是不关心你，我是在计算把你拖进掩体需要多少焦耳的能量。这是我的关心方式。" },
+                        { id: 3, text: "你的性别是？", reply: "我是‘战士’，我是‘预警机’。在生存面前，性别标签是多余的装饰品。你也该把那些标签扔了，跑起来会快点。" }
+                    ]
+                },
+                'h3': { 
+                    start: "嘘。别说话。看那边的长官，她在调整呼吸。我学会了一件事：当女性沉默的时候，通常是在做一个巨大的决定。我只要负责递上弹药就好。",
+                    options: [
+                        { id: 1, text: "你觉得自己微不足道吗？", reply: "不。齿轮也是机器的一部分。我不需要做大脑，做一只灵活的手也很有成就感。她们指引方向，我确信那个方向是安全的。" },
+                        { id: 2, text: "你很怕她们？", reply: "是敬畏。她们承担了做决定的压力——那可是最沉重的负担。我尊重每一个敢于对结果负责的人。" },
+                        { id: 3, text: "想过离开吗？", reply: "去哪？去那些充满谎言的地方吗？这里虽然冷硬，但这里是真实的。只要我有用，我就有尊严。这很公平。" }
+                    ]
+                },
+                // Ⅲ｜忆行国 (Orca)
+                'o1': { 
+                    start: "年轻人都想忘掉痛苦，觉得那是负担。但我留着这道疤，是因为它记录了五十年前的那场海啸。忘掉它，我的孩子们就会在同一片海域被淹死。",
+                    options: [
+                        { id: 1, text: "记忆太重了。", reply: "在这个国家，记忆就是浮力。它让我们不下沉。作为年长者，我的职责就是替你们背负这些重量，好让你们游得轻快一点。" },
+                        { id: 2, text: "您会记恨吗？", reply: "我会记住伤害，以免重蹈覆辙，但这不等于恨。恨是消耗能量，而记忆是储存能量。我们很务实。" },
+                        { id: 3, text: "未来呢？", reply: "未来只是过去的回声。听得清过去的人，才看得到未来。来，坐下，我给你讲讲这块礁石的故事。" }
+                    ]
+                },
+                'o2': { 
+                    start: "我昨晚梦见自己把族谱背错了。醒来时一身冷汗。如果我断了链条，前面一千年的智慧就都丢了。这种恐惧，你懂吗？",
+                    options: [
+                        { id: 1, text: "为什么不写下来？", reply: "写在纸上的会被水泡烂，刻在石头上的会被磨平。只有刻在脑子里的，才会随着血液流传。这是我们爱世界的方式——把它记下来。" },
+                        { id: 2, text: "你可以休息一下。", reply: "穆拉奶奶六十岁了还在记。她没休息，我怎么敢？但我开始学着把故事编成歌，唱出来就没那么沉重了。" },
+                        { id: 3, text: "值得吗？", reply: "当你看到小鲸鱼避开了你记得的陷阱时，你会觉得一切都值得。我们是时间的容器，这很神圣。" }
+                    ]
+                },
+                'o3': { 
+                    start: "今天主母讲了四个小时。我的手抽筋了两次，但我没停。她说的话也许五十年后才有人听懂，我的任务是确保那时候这话还在。",
+                    options: [
+                        { id: 1, text: "你只负责记录？", reply: "倾听也是一种力量。在这个喧嚣的世界，愿意安静下来记录女性智慧的人太少了。我觉得我很荣幸。" },
+                        { id: 2, text: "你不觉得无聊？", reply: "看着历史在眼前流过，怎么会无聊？我是第一个知道结局的人。这种安静的观察让我觉得……我很富有。" },
+                        { id: 3, text: "她们在意你吗？", reply: "她们信任我的笔。这就够了。不需要聚光灯，灯塔的底座从不发光，但它举起了光。" }
+                    ]
+                }
+            },
+            en: {
+                // Ⅰ｜Plumaria (Bird)
+                'b1': {
+                    start: "Look at the feathers on the ground. Each one is a vow they made on stage. The boys are responsible for shining, and I am responsible for weaving that shine into a floor we can walk on.",
+                    options: [
+                        { id: 1, text: "Don't you find sweeping annoying?", reply: "Annoying? Perhaps. But if no one cleans up this beautiful nonsense, our nest would have collapsed long ago. I appreciate their effort, as long as they don't expect beauty alone to feed the children." },
+                        { id: 2, text: "Why watch them perform?", reply: "Because it is a contract. They display vulnerability and beauty; I display assessment and burden. In this nation, the one being watched is surrendering power, and the watcher, holding that power, must be benevolent." },
+                        { id: 3, text: "What do you value most?", reply: "Not who flies the highest, but who lands the steadiest. Only when the wind stops can you see who truly loves this home and who just loves the show." }
+                    ]
+                },
+                'b2': {
+                    start: "I spent three hours mixing this color. The Matriarch said last season's blue was too aggressive, so I added some greyscale. Does this look 'reliable' to you, or just 'vain'?",
+                    options: [
+                        { id: 1, text: "I think it's beautiful.", reply: "Thank you. But in Plumaria, beauty without function is waste. I hope my beauty makes her feel... that I am a partner who can weather the storm with her." },
+                        { id: 2, text: "Why care so much about their opinion?", reply: "Because their eyes are rulers. They can see if the muscle under the feather is taut. Listening to their critique makes me better. It's not submission; it's evolution." },
+                        { id: 3, text: "What if you aren't chosen?", reply: "Then I'll teach the chicks to fly. If I can't be the protagonist, being a good audience is also a contribution. Besides, this color makes me happy too." }
+                    ]
+                },
+                'b3': {
+                    start: "Tea? That boy who just came down is crying loudly. He thought if his heart was sincere enough, the wind would change. Sadly, love, like physics, doesn't run on sentiment.",
+                    options: [
+                        { id: 1, text: "Will you comfort him?", reply: "I won't lie to him. I'll tell him: 'Your feathers are beautiful, just not for this tree.' Kindness between women isn't lying; it's telling the truth and then pouring hot tea." },
+                        { id: 2, text: "Is it always this cruel?", reply: "Choice is always cruel. But not choosing is crueler—that is irresponsible to everyone. We select so the next generation has better wings. It's not personal." },
+                        { id: 3, text: "What about you?", reply: "Me? I'm the one dimming the lights backstage. So the winners aren't too proud, and the losers aren't too embarrassed. That's a form of 'care', isn't it?" }
+                    ]
+                },
+                // Ⅱ｜Riftmark (Hyena)
+                'h1': {
+                    start: "You're standing in a blind spot. If there's an attack, you'll be the first breach. Move three steps left. We don't protect each other with hugs; we protect with positioning.",
+                    options: [
+                        { id: 1, text: "That's too strict.", reply: "Relaxation is a privilege for the dead. In this nation, 'love' means I won't allow you to die from a mistake. My strictness is your survival guarantee." },
+                        { id: 2, text: "Does everyone listen to you?", reply: "They listen to 'logic'. If ignoring me improved efficiency by 1%, I'd shut up and step aside immediately. There are no queens here, only optimal solutions." },
+                        { id: 3, text: "Aren't you tired?", reply: "The system doesn't need the emotion of 'tired'. It needs lubricant. As long as the defense line is intact, I don't feel tired." }
+                    ]
+                },
+                'h2': {
+                    start: "...Pressure dropped. Storm in ten minutes. My knees knew before the radar. Do you need cover?",
+                    options: [
+                        { id: 1, text: "How did you know?", reply: "The body is the best sensor. Many ignore bodily noise, but in Riftmark, we train the body into a precision instrument. Pain is a signal, not torture." },
+                        { id: 2, text: "You seem cold.", reply: "Because excess emotion interferes with signal reception. I'm not uncaring; I'm calculating the joules needed to drag you to safety. That is my way of caring." },
+                        { id: 3, text: "What is your gender?", reply: "I am a 'Warrior', I am an 'Early Warning System'. In the face of survival, gender labels are redundant decorations. You should throw yours away too; you'll run faster." }
+                    ]
+                },
+                'h3': {
+                    start: "Shh. Don't speak. Look at the Commander, she's adjusting her breathing. I learned one thing: when women are silent, they are usually making a massive decision. I just need to hand over the ammo.",
+                    options: [
+                        { id: 1, text: "Do you feel insignificant?", reply: "No. A gear is part of the machine. I don't need to be the brain; being a flexible hand is fulfilling. They steer, and I ensure the direction is safe." },
+                        { id: 2, text: "Are you afraid of them?", reply: "It's reverence. They bear the pressure of decision-making—the heaviest burden. I respect anyone who dares to be responsible for the outcome." },
+                        { id: 3, text: "Ever thought of leaving?", reply: "To where? Places full of lies? It's cold and hard here, but it's real. As long as I am useful, I have dignity. That is fair." }
+                    ]
+                },
+                // Ⅲ｜Mnemos (Orca)
+                'o1': {
+                    start: "Young ones want to forget pain, thinking it a burden. But I keep this scar because it records the tsunami fifty years ago. Forget it, and my children will drown in the same waters.",
+                    options: [
+                        { id: 1, text: "Memory is too heavy.", reply: "In this nation, memory is buoyancy. It keeps us from sinking. As an elder, my duty is to carry this weight so you can swim a bit lighter." },
+                        { id: 2, text: "Do you hold grudges?", reply: "I remember harm to avoid repeating it, but that isn't hate. Hate consumes energy; memory stores it. We are pragmatic." },
+                        { id: 3, text: "What about the future?", reply: "The future is just an echo of the past. Only those who hear the past clearly can see the future. Come, sit. Let me tell you the story of this reef." }
+                    ]
+                },
+                'o2': {
+                    start: "I dreamt I recited the genealogy wrong last night. Woke up in a cold sweat. If I break the chain, a thousand years of wisdom is lost. Do you understand that fear?",
+                    options: [
+                        { id: 1, text: "Why not write it down?", reply: "Paper rots in water, stone wears smooth. Only what is carved in the brain flows with the blood. This is how we love the world—by remembering it." },
+                        { id: 2, text: "You can rest.", reply: "Grandmother Mu La is sixty and still remembering. She hasn't rested; how dare I? But I'm learning to weave stories into songs. It's less heavy when sung." },
+                        { id: 3, text: "Is it worth it?", reply: "When you see a calf avoid a trap you remembered, you feel it is all worth it. We are vessels of time. It is sacred." }
+                    ]
+                },
+                'o3': {
+                    start: "The Matriarch spoke for four hours today. My hand cramped twice, but I didn't stop. Her words might not be understood for fifty years; my task is ensuring they are still there when that time comes.",
+                    options: [
+                        { id: 1, text: "You only record?", reply: "Listening is also a power. In this noisy world, few are willing to quietly record female wisdom. I feel honored." },
+                        { id: 2, text: "Isn't it boring?", reply: "Watching history flow before my eyes? How could it be? I am the first to know the ending. This quiet observation makes me feel... wealthy." },
+                        { id: 3, text: "Do they care about you?", reply: "They trust my pen. That is enough. No need for a spotlight; the base of the lighthouse never shines, but it holds up the light." }
+                    ]
+                }
+            }
+        };
+        
+        // ============================================================================
+        // 📚 EXPANDED: Route Stories
+        // ============================================================================
+        
+        const ROUTE_TALES = {
+            zh: {
+                bird_hyena: [
+                    "正在把一批用旧的彩色羽毛运往裂识国做伪装网，虽然那边守卫觉得太花哨了。",
+                    "羽择国的信使试图给裂识国守卫讲笑话，导致关口堵塞了三分钟。",
+                    "运送“情绪舒缓茶”去裂识国前线，据说那边压力大到空气都凝固了。",
+                    "一只迷路的孔雀误入了裂识国巡逻队，正在被教导如何“站得像个战士”。",
+                    "裂识国发来警告：请不要在军事缓冲区跳求偶舞，会触发警报。",
+                    "羽择国赠送了一批镜子给裂识国，被对方退回，理由是“不需要看脸”。",
+                    "运送一批加急的舞台帷幕，裂识国拿去做了临时的防风帐篷。",
+                    "羽择国舞者正在前往裂识国，据说要在严肃的早会上表演“放松操”。",
+                    "裂识国要求羽择国空运一些“不那么刺鼻”的香料，之前的太香了影响嗅觉。",
+                    "运送求偶季节剩下的鲜花去裂识国，希望能给他们的钢铁大厅加点颜色。",
+                    "羽择国正在向裂识国出口“拒绝的艺术”课程，因为裂识国人太直接了。",
+                    "裂识国士兵正在羽择国边境帮忙搭建防风墙，他们受不了那些脆弱的装饰柱。",
+                    "一批用过的羽毛笔正在运往裂识国，虽然他们更喜欢用金属刻刀。",
+                    "羽择国的一只乐团在边境迷路，被裂识国巡逻队当成噪音武器扣押了。",
+                    "裂识国请求羽择国支援一批“好看但没用”的装饰品，用来迷惑敌人。"
+                ],
+                hyena_bird: [
+                    "裂识国向羽择国输送了一批“高效时间管理指南”，被当地艺术家拿去垫桌角了。",
+                    "运送一批高强度建筑材料修补鸟巢，顺便附赠了“如何不被风吹跑”的建议。",
+                    "裂识国巡逻队路过，顺手帮羽择国把歪掉的装饰柱扶正了（强迫症大满足）。",
+                    "这趟航线运送的是“绝对沉默”，因为羽择国的早晨实在是太吵了。",
+                    "裂识国正在协助羽择国搭建新的舞台，理由是现在的结构不符合安全规范。",
+                    "裂识国送来一批标准化的训练假人，被羽择国幼崽打扮成了时尚模特。",
+                    "一份关于“如何站立不动超过五分钟”的教程正在运往羽择国多动症治疗中心。",
+                    "裂识国工兵正在帮羽择国清理表演后的场地，效率是当地人的十倍。",
+                    "运送一批防噪音耳塞给羽择国的伴奏乐队，防止他们自己被吵聋。",
+                    "裂识国发来最后通牒：请羽择国信使不要在我们的哨塔上筑巢！",
+                    "运送一批除锈剂去羽择国，因为他们觉得裂识国的礼物都有一股铁锈味。",
+                    "裂识国教官正在给羽择国幼崽上“队列纪律”课，幼崽们以为是在排舞。",
+                    "一批高能压缩军粮被送到羽择国，但被嫌弃“毫无摆盘美感”。",
+                    "裂识国正在回收羽择国废弃的金属装饰，准备熔了做箭头。",
+                    "运送一批“防止过度情绪化”的镇静剂，专门供给羽择国的失恋诗人。"
+                ],
+                bird_orca: [
+                    "把今天的八卦新闻封存进防水胶囊，沉入深海给忆行国做历史注脚。",
+                    "羽择国艺术家想去深海采风，正在跟忆行国申请“不被当成鱼饵”的通行证。",
+                    "运送一批干燥的阳光味道去海底，老海龟说这让他想起陆地上的初恋。",
+                    "一根金色的羽毛掉进了深海，现在被当成“陆地文明的遗迹”在展览。",
+                    "羽择国正在向忆行国请教：如何记住前任的坏，而不是只记得他的美？",
+                    "运送一批防水的闪粉去深海，希望能让那里的发光水母更亮一点。",
+                    "羽择国歌手正在海边对着海浪唱歌，试图把新歌传给深海的鲸鱼。",
+                    "忆行国发来请求：请羽择国不要把失败的求偶礼物扔进海里，海龟消化不了。",
+                    "一只海鸥正在给浮出水面的虎鲸讲述昨天羽择国发生的三角恋。",
+                    "运送一批陆地昆虫标本去深海学校，作为“外星生物”展示。",
+                    "羽择国正在向忆行国咨询：怎么才能像你们一样几十年都不换衣服？",
+                    "一批风干的花瓣被运往深海，用来制作海底的香囊。",
+                    "羽择国舞者试图在海面上表演“水上漂”，被忆行国巡逻队救起。",
+                    "运送“天空的颜色”色卡去深海，因为那里的画师只知道蓝色。",
+                    "羽择国信使正在和海豚比赛谁叫得更难听，目前不分胜负。"
+                ],
+                orca_bird: [
+                    "运来一批深海珍珠，由于太重，羽择国的快递员正在抗议。",
+                    "忆行国长老送来一段关于风暴的记忆，提醒羽择国下周加固巢穴。",
+                    "一条老鲸鱼想看一眼天空，羽择国正在组织飞行队为他在海面上空表演。",
+                    "深海的信使抱怨羽择国太干了，要求每十分钟泼一次水。",
+                    "忆行国发来询问：你们上次承诺的“绝美晚霞”什么时候发货？",
+                    "运送一批深海冷泥，据说对修复羽毛光泽有奇效。",
+                    "忆行国正在向羽择国传授“如何优雅地老去”，而不是拼命掩盖皱纹。",
+                    "一段关于“沉没大陆”的古老歌谣正在被传授给羽择国的吟游诗人。",
+                    "深海的洋流图谱被送到羽择国，帮助他们预测下一季的迁徙风向。",
+                    "忆行国长老感叹：羽择国的鸟儿飞得太快，灵魂都快追不上了。",
+                    "运送一批可以吃的海藻纸，专门给羽择国写易碎的情书。",
+                    "深海发来抗议：羽择国最近的烟花表演吓到了浅海的沙丁鱼。",
+                    "忆行国正在回收羽择国掉落的羽毛，用来编织海底的保暖层。",
+                    "一条关于“不要在海上乱扔垃圾”的记忆被植入羽择国幼崽的梦中。",
+                    "运送一批深海回音螺，可以记录羽择国最美的歌声。"
+                ],
+                hyena_orca: [
+                    "裂识国正在向忆行国交换“如何快速遗忘痛苦”的技巧，但忆行国表示：我们只教怎么记。",
+                    "运送一批水下作战装备去深海，交换条件是忆行国帮忙寻找失踪的族谱。",
+                    "裂识国战士在海边休息，被忆行国的幼崽当成了不会游泳的大狗。",
+                    "一条秘密航线：裂识国首领偷偷向忆行国咨询自己祖母的故事。",
+                    "双方正在争论是“活在当下”重要，还是“铭记历史”重要，目前吵到了第三轮。",
+                    "裂识国请求忆行国帮忙寻找一百年前丢失的一面战旗。",
+                    "运送一批高蛋白压缩饼干去深海，虽然忆行国觉得这东西难吃得像石头。",
+                    "裂识国正在学习海豚的声纳技术，试图改进他们的夜间通讯系统。",
+                    "忆行国记录员正在旁观裂识国的演习，一边摇头一边记录“无效的能量消耗”。",
+                    "裂识国向深海输送了一批多余的钢铁废料，希望能沉去做人工鱼礁。",
+                    "裂识国正在向忆行国订购“战术记忆清除”服务，但对方拒绝提供。",
+                    "运送一批防水的战术目镜去深海，换取最新的海图。",
+                    "裂识国工兵试图在海底建立前哨站，被忆行国劝退了。",
+                    "一条关于“忠诚与背叛”的历史记录正在被运往裂识国档案室。",
+                    "裂识国战士正在海边学习游泳，被一群海獭围观嘲笑。"
+                ],
+                orca_hyena: [
+                    "忆行国向裂识国输送了一批镇静海盐，希望能治好他们的战斗焦虑。",
+                    "深海档案库发来预警：一百年前这条路发生过泥石流，请绕行。",
+                    "一只海龟试图教裂识国的鬣狗“慢生活”，结果差点被急死。",
+                    "忆行国正在记录裂识国的战术演变，作为“陆地生物好斗性”的研究样本。",
+                    "运送一批冰冷的海水去降温，裂识国的机械核心过热了。",
+                    "忆行国送来一段“和平年代”的记忆影像，裂识国士兵看哭了。",
+                    "深海的治疗师正在尝试用鲸歌治疗裂识国老兵的PTSD。",
+                    "忆行国发来提醒：你们现在的领袖长得很像两百年前那个导致分裂的家伙。",
+                    "运送一批深海发光苔藓，照亮裂识国阴暗的地下通道。",
+                    "忆行国幼崽在海边搁浅，裂识国出动了整整一个排的兵力把它推回去。",
+                    "忆行国正在向裂识国解释“原谅”的概念，目前进展缓慢。",
+                    "运送一批深海凝胶，用来修复裂识国生锈的关节。",
+                    "深海长老建议裂识国多睡觉，少打架，被裂识国当成了挑衅。",
+                    "一段关于“团结”的古老誓言被重新发现，送往裂识国总部。",
+                    "忆行国正在研究裂识国的盔甲，试图弄明白他们到底在怕什么。"
+                ]
+            },
+            en: {
+                 bird_hyena: [
+                     "Exporting colorful feathers for camouflage nets; Hyena guards think they're 'too loud'.",
+                     "A Bird messenger tried telling a joke at the border, causing a 3-minute logic jam.",
+                     "Sending 'Calming Tea' to Hyena frontlines; rumor says the air there is solid with stress.",
+                     "A peacock got lost in a Hyena patrol and is being taught to 'stand like a warrior'.",
+                     "Warning from Hyena: Please do not perform mating dances in the buffer zone. It triggers alarms.",
+                     "Birds sent mirrors; Hyenas returned them: 'Efficiency does not require vanity'.",
+                     "Sending stage curtains; Hyenas repurposed them as emergency wind shelters.",
+                     "Bird dancers heading to Hyena morning briefing for mandatory 'Relaxation Drills'.",
+                     "Hyenas requested less fragrant spices; the last batch ruined their scent tracking.",
+                     "Sending leftover Valentine flowers to brighten up the Hyena steel halls.",
+                     "Exporting 'The Art of Rejection' classes to Hyenas, who are naturally too blunt.",
+                     "Hyena soldiers helping build wind walls; they detest fragile decorative pillars.",
+                     "Sending used quill pens to Hyena, though they prefer cold metal styluses.",
+                     "A Bird band got lost and was detained as 'sonic weaponry' by Hyena patrol.",
+                     "Hyena requesting 'pretty but useless' decoys to confuse enemy aesthetics."
+                 ],
+                 hyena_bird: [
+                     "Hyenas sent 'Time Management Guides'; Bird artists used them to stabilize tables.",
+                     "Sending reinforced steel for nest repair, attached with a 'Wind Safety Manual'.",
+                     "A Hyena patrol straightened a crooked Bird pillar just to satisfy their OCD.",
+                     "Exporting 'Absolute Silence' because the Bird capital is simply too noisy at dawn.",
+                     "Hyenas helping build a new stage; the old one was deemed 'structurally irresponsible'.",
+                     "Hyenas sent training dummies; Bird kids dressed them up as avant-garde models.",
+                     "A tutorial on 'Standing Still for 5 Minutes' sent to the Bird ADHD treatment center.",
+                     "Hyena engineers cleaning up after a Bird festival with 10x the local efficiency.",
+                     "Sending tactical earplugs to the Bird backing band to save their hearing.",
+                     "Ultimatum: Please stop building romantic nests on our surveillance towers!",
+                     "Sending industrial rust remover; Birds complain Hyena gifts always smell of iron.",
+                     "Hyena drill sergeants teaching 'Formation Discipline'; Bird kids think it's a line dance.",
+                     "High-energy rations sent to Birds; rejected for 'lack of plating aesthetics'.",
+                     "Hyenas recycling Bird metal scraps for arrowheads. Nothing is wasted.",
+                     "Sending sedatives for 'over-emotional' Bird poets who faint too often."
+                 ],
+                 bird_orca: [
+                     "Dropping gossip capsules into the deep sea to serve as historical footnotes.",
+                     "Bird artist applying for a 'Not-Bait' pass to sketch underwater landscapes.",
+                     "Sending 'Scent of Dried Sunshine' to an old turtle who misses the land.",
+                     "A golden feather fell into the sea; now exhibited as a 'Rare Land Relic'.",
+                     "Birds asking Orcas: 'How do you remember the bad parts without losing hope?'",
+                     "Sending waterproof glitter to make deep-sea jellyfish a bit shinier.",
+                     "Bird singer serenading waves, trying to teach whales a new pop song.",
+                     "Orca request: Please stop throwing failed gifts into the sea. Turtles can't digest shame.",
+                     "A seagull telling a surfaced orca about yesterday's dramatic love triangle.",
+                     "Sending land insect specimens to the deep sea school as 'Aliens'.",
+                     "Birds asking Orcas: How do you stand wearing the same skin for decades?",
+                     "Sending dried petals for underwater sachets.",
+                     "Bird dancer tried 'water walking'; rescued by Orca patrol and scolded.",
+                     "Sending 'Sky Color' swatches; deep sea painters only know fifty shades of blue.",
+                     "Bird messenger competing with a dolphin on who makes the weirdest noise."
+                 ],
+                 orca_bird: [
+                     "Delivering deep-sea pearls; Bird couriers complaining they are too heavy to fly with.",
+                     "Elder sent a memory of a storm from 1902; warning Birds to reinforce nests now.",
+                     "Old whale wants to see the sky; Birds organizing an air show for him.",
+                     "Sea messenger complains it's too dry; demands a bucket of water every 10 mins.",
+                     "Orca inquiry: When is that 'Beautiful Sunset' you promised arriving?",
+                     "Sending deep-sea mud; rumored to fix feather gloss and hide wrinkles.",
+                     "Orcas teaching Birds 'How to Age Gracefully' instead of hiding every grey feather.",
+                     "An ancient song about 'Sunken Lands' being taught to Bird bards.",
+                     "Sending current maps to help Birds predict migration winds.",
+                     "Elder sighs: 'Birds fly too fast; their souls can't catch up.'",
+                     "Sending edible seaweed paper for fragile love letters that dissolve in tears.",
+                     "Deep sea protest: Bird fireworks are scaring the sardines and waking the elders.",
+                     "Orcas collecting fallen feathers to weave warm layers for the seabed.",
+                     "Implanting a memory of 'No Littering' into Bird dreams.",
+                     "Sending echo-shells to record the best Bird songs for the archive."
+                 ],
+                 hyena_orca: [
+                     "Hyenas asking for 'How to Forget Pain'; Orcas reply 'We only teach Remembering'.",
+                     "Trading underwater weapons for help finding a lost family genealogy book.",
+                     "Hyena soldier resting by sea; Orca kid thinks he's a dog that can't swim.",
+                     "Secret route: Hyena leader asking Orca about her grandmother's true story.",
+                     "Debating 'Live in Now' vs 'Remember History' (Round 3 of the century).",
+                     "Hyenas asking Orcas to find a war banner lost 100 years ago in a wreck.",
+                     "Sending protein bars to sea; Orcas think they taste like dry rocks.",
+                     "Hyenas studying dolphin sonar to improve night comms and stealth.",
+                     "Orca scribe watching Hyena drill, noting 'Inefficient Energy Use' in the log.",
+                     "Hyenas dumping scrap metal; hoping it becomes an artificial reef for fish.",
+                     "Hyenas ordering 'Memory Wipe'; Orcas refuse service on ethical grounds.",
+                     "Trading waterproof tactical goggles for latest sea charts.",
+                     "Hyena engineers tried building an outpost underwater; Orcas kindly advised against it.",
+                     "Sending a history record of 'Loyalty & Betrayal' to Hyena archives.",
+                     "Hyena soldiers learning to swim; otters are laughing at their dog-paddle."
+                 ],
+                 orca_hyena: [
+                     "Sending calming sea salt to treat Hyena combat anxiety.",
+                     "Archive Warning: Mudslide happened here 100 years ago. Detour immediately.",
+                     "Turtle tried teaching Hyena 'Slow Living'; Hyena almost died of impatience.",
+                     "Orcas recording Hyena tactics as 'Land Aggression Study' for future generations.",
+                     "Delivering ice water; Hyena mechanical core overheated from overthinking.",
+                     "Sending a memory of 'Peace Time'; Hyena soldiers watched it and cried.",
+                     "Deep sea healers trying whale songs on Hyena PTSD.",
+                     "Orca note: Your leader looks just like the one who caused the split 200 years ago.",
+                     "Sending glowing moss to light up Hyena tunnels without using fire.",
+                     "Orca calf beached; Hyena platoon pushed it back with surprising gentleness.",
+                     "Orcas explaining 'Forgiveness' to Hyenas; progress is mathematically slow.",
+                     "Sending deep-sea gel to fix rusty joints and silence armor creaks.",
+                     "Elder advised Hyenas to sleep more; Hyenas took it as an insult to their vigilance.",
+                     "An ancient oath of 'Unity' rediscovered; sent to Hyena HQ for verification.",
+                     "Orcas studying Hyena armor; trying to understand what they are so afraid of."
+                 ]
+            }
+        };
+
+        // ============================================================================
+        // 📜 Text Data
+        // ============================================================================
+
+        // 🇬🇧 English Content
+        const ENGLISH_CONTENT = {
+            ui: {
+              enter: "〔 ACCEPT INVITATION 〕", 
+              home: "Sanctuary", 
+              backMap: "Return to World Map", 
+              viewPaper: "View Today's Gazette", 
+              askEnter: "In what guise shall you enter this world?", 
+              identityQ: "Select your identity orientation:", 
+              traitQ: "To which life philosophy do you drift?", 
+              male: "Male", 
+              female: "Female", 
+              nonBinary: "Non-binary / Queer", 
+              undefined: "Undefined", 
+              noAnswer: "Prefer not to say",
+              
+              letterTitle: "《 An Invitation from the Matriarchal Utopia 》",
+              letterContent: [
+                "Dear Visiting Consciousness,",
+                "The moment you unfold this letter, the world has already begun to turn.",
+                "This realm is not a single nation, but a coalition of three distinct societies.",
+                "They are all founded on matriarchal principles, yet their modes of existence diverge. Each nation evolves its structure based on a unique logic of life and perception."
+              ],
+              letterNations: [
+                "This coalition does not seek to replace patriarchy with a mirror image. Its goal is to avoid repeating the hierarchies of old.",
+                "Here, matriarchy does not mean power concentrated at a peak, but power dispersed, responsibility shared, flowing through relationships.",
+                "This society views the perception of the minority not as a flaw, but as a strength. Through 'becoming-woman', 'becoming-minority', 'becoming-animal', it affirms the power of the other."
+              ],
+              
+              traitDisclaimer: "This world affirms matriarchy but does not exclude the masculine. It seeks not to swap the seat of power, but to transcend the throne itself.",
+              traitDisclaimer2: "Those who align with this philosophy, willing to explore egalitarian relationships and new modes of sensing, are welcome.",
+              traitDisclaimer3: "You need not choose a nation. Your sensory system will guide you to where you resonate.",
+              traitDisclaimer4: "Before entry, we must confirm how you wish to relate to this world.",
+              traitDisclaimer5: "These choices do not dictate your fate, only how the world prepares to meet you.",
+              traitDisclaimer6: "If you are willing to accept this invitation, you may enter.",
+              
+              module1: "Perception & Ability",
+              module2: "Chamber of Reproductive Rights",
+              module3: "Transnational Care Network",
+              perceptionTitle: "Perception Archives",
+              councilTitle: "Chamber of Reproductive Rights",
+              networkTitle: "Transnational Care Network",
+              identityVerified: "Identity Verified",
+              duty: "Duty",
+              systemAdvice: "System Assessment",
+              matchText: "Based on your value matrix, you are highly aligned with the social structure of {match}.",
+              altMatchText: "Latent Potential: Certain traits (e.g., {title}) also suggest adaptability to {altMatch}.",
+              backList: "← Return to Agenda",
+              routeInfo: "Care Route",
+              networkStats: "Active Care Routes: {count} | Resource Flow Efficiency: 98.5%",
+              openInvite: "OPEN",
+              
+              traits: {
+                express: 'Adornment, Expression & Attraction',
+                power: 'Strength & Execution',
+                memory: 'Memory & Experience'
+              },
+              abilityLabels: {
+                emotion: 'Emotion',
+                rhythm: 'Rhythm',
+                relation: 'Relation',
+                space: 'Space',
+                scent: 'Scent',
+                conflict: 'Conflict'
+              },
+              createChar: "Create Character",
+              chat: "Talk",
+              storyPrompt: "Create your OC (Own Character)",
+              storyPlaceholder: "Describe your OC: their personality, occupation, relationships, history, scars, and dreams...",
+              chatPlaceholder: "Say something...",
+              sending: "Thinking...",
+              creatorTitle: "Somatic Collage & Soul Injection",
+              locationSelect: "Select Region",
+              locations: ["Plumaria · Capital", "Plumaria · Border", "Riftmark · Wilds", "Mnemos · Deep Bank"],
+              
+              ocGuideTitle: "Create Your Own Character (OC)",
+              ocGuideText: [
+                  "In this ideal matriarchal society, what does beauty look like to you?",
+                  "Please follow the steps to create your own OC (Own Character).",
+                  "The left shows a reference image, but you are free to unleash your imagination and create monstrous forms.",
+                  "Here, form is fluid. As long as the soul resonates, appearance is freedom."
+              ],
+              collageTitle: "Collage Materials",
+              
+              // NPC Stats UI
+              labelHeight: "Height",
+              labelAge: "Age",
+              labelGender: "Gender",
+              labelStatus: "Status",
+              labelPersonality: "Personality",
+              dialogue: {
+                  you: "You",
+                  end: "End Dialogue"
+              }
+            },
+            nations: {
+              bird: {
+                name: 'Ⅰ｜Plumaria', 
+                sub: 'Matriarchy of Choice', 
+                desc: 'A Society Driven by the Contract of Display & Burden',
+                content: `
+                  <div class="font-mono text-sm leading-relaxed text-[#292524]">
+                      <div class="border-b-2 border-[#78350f] pb-4 mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                           <span class="bg-[#292524] text-[#dcd0bb] px-2 py-1 font-bold">【Part 1: Nation Overview】</span>
+                           <span class="text-xs tracking-widest opacity-60">REF: PLM-01</span>
+                        </div>
+                        <p class="mb-2"><span class="text-[#be123c] font-bold">🦚 Inspiration:</span> Birds of Paradise / Bowerbirds / Reverse Chivalry</p>
+                        
+                        <div class="pl-4 border-l-2 border-[#a8a29e] mb-4">
+                           <strong class="block text-[#78350f] mb-1">Power Structure:</strong>
+                           <p>Here, supreme power belongs to the "Choosers" (Females). Males do not fight for mates through violence but prove genetic superiority by evolving extreme "Beauty"—massive plumage, complex dances, or perfect nests.</p>
+                        </div>
+                        
+                        <div class="pl-4 border-l-2 border-[#a8a29e]">
+                           <strong class="block text-[#78350f] mb-1">Somatic Logic:</strong>
+                           <p>Beauty is not for pleasure; it is proof of capacity. If a male can survive the jungle while carrying heavy ornamentation, he proves his strength. Beauty is the redundancy of power.</p>
+                        </div>
+                      </div>
+
+                      <div class="relative bg-[#f5f5f4] p-4 border border-[#a8a29e] shadow-inner">
+                        <div class="absolute -top-3 -right-3 secret-stamp">REJECTED</div>
+                        <div class="mb-2 font-bold text-[#78350f] border-b border-[#a8a29e] pb-1">【Part 2: Internal Archive】</div>
+                        <div class="text-xs font-bold mb-2">📂 File Type: Royal Nesting Bureau · Rejection Letter #8821</div>
+                        
+                        <div class="space-y-2 text-xs font-mono">
+                            <p><span class="opacity-60">Applicant:</span> Male Dancer "Cloud-Spot"</p>
+                            <p><span class="opacity-60">Reason for Rejection:</span> <br/>"The applicant attempted to artificially extend his tail feathers by 150% to distract from the loose foundation of his nest. We reiterate: Plumaria does not need colorful kites that just reflect light; we need fathers who can withstand a typhoon. Your glamour has no roots, and that is the ultimate irresponsibility to the bloodline."</p>
+                            <p class="mt-2 p-2 bg-[#fee2e2] text-[#991b1b] border border-[#f87171]"><span class="font-bold">Verdict:</span> Display rights revoked. Reassigned to border wind-wall repair duty until he learns how to dig a foundation.</p>
+                        </div>
+                      </div>
+                  </div>`
+              },
+              hyena: {
+                name: 'Ⅱ｜Riftmark', 
+                sub: 'Post-Gender Order', 
+                desc: 'An Iron Order of Rationality & Survival Efficiency',
+                content: `
+                   <div class="font-mono text-sm leading-relaxed text-[#292524]">
+                      <div class="border-b-2 border-[#854d0e] pb-4 mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                           <span class="bg-[#292524] text-[#dcd0bb] px-2 py-1 font-bold">【Part 1: Nation Overview】</span>
+                           <span class="text-xs tracking-widest opacity-60">REF: RFT-09</span>
+                        </div>
+                        <p class="mb-2"><span class="text-[#b45309] font-bold">🐆 Inspiration:</span> Spotted Hyenas / Sparta / Cyber-Ascension</p>
+                        
+                        <div class="pl-4 border-l-2 border-[#a8a29e] mb-4">
+                           <strong class="block text-[#78350f] mb-1">Power Structure:</strong>
+                           <p>A militarized society ruled absolutely by matrilineal clans. Here, "Gender" is viewed as inefficient noise. All members, regardless of biology, exist solely as "Warriors." Rank is determined by bloodline at birth and is absolute.</p>
+                        </div>
+                        
+                        <div class="pl-4 border-l-2 border-[#a8a29e]">
+                           <strong class="block text-[#78350f] mb-1">Somatic Logic:</strong>
+                           <p>The body is an instrument of execution, not a canvas for expression. Emotion is an impurity that slows reaction time. On the battlefield, a 0.1s hesitation is death, so we excised the organ of hesitation.</p>
+                        </div>
+                      </div>
+
+                      <div class="relative bg-[#f5f5f4] p-4 border border-[#a8a29e] shadow-inner">
+                        <div class="absolute -top-3 -right-3 secret-stamp border-amber-700 text-amber-700">VIOLATION</div>
+                        <div class="mb-2 font-bold text-[#78350f] border-b border-[#a8a29e] pb-1">【Part 2: Internal Archive】</div>
+                        <div class="text-xs font-bold mb-2">📂 File Type: Tactical Command · Infraction Log</div>
+                        
+                        <div class="space-y-2 text-xs font-mono">
+                            <p><span class="opacity-60">Subject:</span> Patrol Squad 7</p>
+                            <p><span class="opacity-60">Violation:</span> <br/>"Squad members were monitored discussing 'what color dresses they would wear if they lived in Plumaria' during rest intervals. This meaningless hypothetical wasted 30 seconds of tactical review time and caused unnecessary heart rate fluctuations."</p>
+                            <p class="mt-2 p-2 bg-[#fef3c7] text-[#92400e] border border-[#fcd34d]"><span class="font-bold">Commander's Order:</span> "Administer Level-2 Emotion Suppressants to all members. Remember: You do not need personalities, names, or genders. You only need to be sharp teeth that crush the enemy."</p>
+                        </div>
+                      </div>
+                  </div>`
+              },
+              orca: {
+                name: 'Ⅲ｜Mnemos', 
+                sub: 'The Polity of Memory', 
+                desc: 'A Gerontocracy Ruled by the Depth of Trauma',
+                content: `
+                   <div class="font-mono text-sm leading-relaxed text-[#292524]">
+                      <div class="border-b-2 border-[#1e3a8a] pb-4 mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                           <span class="bg-[#292524] text-[#dcd0bb] px-2 py-1 font-bold">【Part 1: Nation Overview】</span>
+                           <span class="text-xs tracking-widest opacity-60">REF: MNM-X3</span>
+                        </div>
+                        <p class="mb-2"><span class="text-[#1d4ed8] font-bold">🐋 Inspiration:</span> Orcas / Elephants / Historian Culture</p>
+                        
+                        <div class="pl-4 border-l-2 border-[#a8a29e] mb-4">
+                           <strong class="block text-[#78350f] mb-1">Power Structure:</strong>
+                           <p>In Mnemos, elder females hold the core voice because they are living libraries. Power comes not from physical strength, but from the "Survival Paths" stored in their cranial capacity.</p>
+                        </div>
+                        
+                        <div class="pl-4 border-l-2 border-[#a8a29e]">
+                           <strong class="block text-[#78350f] mb-1">Somatic Logic:</strong>
+                           <p>Time is the only currency. Forgetting is the ultimate sin. A leader's duty is to remember the pain that could kill the clan (like famine centuries ago, or the scent of a tsunami), ensuring they navigate around future reefs. The deeper the wrinkles, the higher the status.</p>
+                        </div>
+                      </div>
+
+                      <div class="relative bg-[#f5f5f4] p-4 border border-[#a8a29e] shadow-inner">
+                        <div class="absolute -top-3 -right-3 secret-stamp border-blue-800 text-blue-800">TOP SECRET</div>
+                        <div class="mb-2 font-bold text-[#78350f] border-b border-[#a8a29e] pb-1">【Part 2: Internal Archive】</div>
+                        <div class="text-xs font-bold mb-2">📂 File Type: Cortex Scan · Top Secret Medical Record</div>
+                        
+                        <div class="space-y-2 text-xs font-mono">
+                            <p><span class="opacity-60">Subject:</span> Matriarch Elder Mu La</p>
+                            <p><span class="opacity-60">Status:</span> Severe Insomnia (Duration: 72 hours)</p>
+                            <p><span class="opacity-60">Scribe's Note:</span> <br/>"The Elder refuses sedation. She insists on repeating the sensation of 'warming currents' from the volcanic eruption 100 years ago to the next generation. She gripped my hand and said: 'If I sleep, the memory fades; if we forget that scent, the children will die next time the disaster strikes.'"</p>
+                            <p class="mt-2 p-2 bg-[#dbeafe] text-[#1e40af] border border-[#93c5fd]"><span class="font-bold">Conclusion:</span> Her insomnia is the final shield protecting the entire nation.</p>
+                        </div>
+                      </div>
+                  </div>`
+              }
+            },
+            npcs: [
+              // Bird Nation (Plumed)
+              { 
+                id: 'b1', name: 'Yu Lan', height: '176', age: '35', gender: 'Female', relation: 'Partnered', 
+                personality: 'Calm, Structural Auditor', 
+                log: "Yu Lan stopped watching performances for 'beauty' years ago. She now looks for structural integrity. She remembers a male whose display was blindingly gold, but whose nest foundation cracked in the first rain. Since then, she respects those who spend more time on the mud base than the feather tip. She often tells young females: 'Pick the one who knows how to fix a leak, not just the one who shines in the sun.'"
+              },
+              { 
+                id: 'b2', name: 'Suo Yu', height: '168', age: '22', gender: 'Male', relation: 'Candidate', 
+                personality: 'Perfectionist, Respectful Listener', 
+                log: "Suo Yu holds a pigment brush like a weapon. He isn't trying to conquer; he's trying to fit a standard he admires. He spends his days asking the matriarchs for critique—not to flatter them, but because he genuinely believes their eye is sharper. 'If she says blue is too cold,' he thinks, 'then the world is indeed too cold.' He finds dignity in adapting himself to a warmer spectrum."
+              },
+              { 
+                id: 'b3', name: 'Cheng Qi', height: '160', age: '29', gender: 'Female', relation: 'Social Glue', 
+                personality: 'Gentle, Secret Keeper', 
+                log: "Cheng Qi is the safety net. When a male is rejected, it is Cheng Qi who hands him a towel and says, 'It's not a failure, just a mismatch.' She competes with no one. Her power lies in ensuring that the disappointment of the unchosen does not turn into resentment. She knits the community together with soft words and hot tea, believing that emotional labor is the spine of the nation."
+              },
+              // Hyena Nation (Fractured)
+              { 
+                id: 'h1', name: 'He Ya', height: '182', age: '48', gender: 'Female', relation: 'Commander', 
+                personality: 'Ruthless Efficiency, Hidden Care', 
+                log: "He Ya's love language is a perimeter check. She doesn't hug; she ensures your flank is covered. To her, chaos is the only enemy. She treats the young males not as servants, but as crucial gears that must not break. Her reprimands are loud, but she has never lost a single member under her command to a preventable accident. That is her maternal vow."
+              },
+              { 
+                id: 'h2', name: 'Kai', height: '174', age: '24', gender: 'Unlabeled', relation: 'Sensor', 
+                personality: 'Somatic, Hyper-aware', 
+                log: "Kai exists as a biological radar. Kai doesn't speak in sentences but in coordinates and sensations. 'Pressure drop, 30 millibars.' Kai has transcended the need for gender validation, finding it inefficient. The only thing that matters is how fast the body can react to a threat. Kai is the purest expression of the nation's survival instinct."
+              },
+              { 
+                id: 'h3', name: 'Yi Lan', height: '169', age: '31', gender: 'Male', relation: 'Integrated', 
+                personality: 'Cautious, Observant Support', 
+                log: "Yi Lan survived by learning to read silence. He knows that when the female leaders go quiet, they are processing heavy data. He doesn't interrupt; he prepares the supplies they will need when they speak. He doesn't see this as submission, but as specialized competence. 'They steer the ship,' he says, 'I keep the engine oiled. Both keep us afloat.'"
+              },
+              // Orca Nation (Mnemonic)
+              { 
+                id: 'o1', name: 'Mu La', height: '158', age: '67', gender: 'Female', relation: 'Widow/Elder', 
+                personality: 'Living Library, Pragmatic', 
+                log: "Mu La carries the weight of a century. She insists on retelling the stories of famine and loss, not to depress the young, but to inoculate them. She views her memory as a navigational chart. She is tough on those who forget, because in the deep ocean, forgetting a current means death. Her wrinkles are the pages of the nation's survival guide."
+              },
+              { 
+                id: 'o2', name: 'Yi Nuo', height: '170', age: '26', gender: 'Female', relation: 'Heir', 
+                personality: 'Anxious, Diligent', 
+                log: "Yi Nuo is terrified of dropping the torch. She follows Mu La like a shadow, lips moving silently as she mimics every word of the oral history. She worries that her generation is too soft, too distracted. Every night, she recites the genealogy of the clan to the stars, praying that her mind remains a watertight vessel for the truth."
+              },
+              { 
+                id: 'o3', name: 'Ta Lin', height: '165', age: '34', gender: 'Male', relation: 'Scribe', 
+                personality: 'Quiet, Archivist', 
+                log: "Ta Lin finds peace in the background. While the matriarchs debate and decide, he records. He believes that male strength in this world is best used to preserve female wisdom. He writes down even the disagreements, the hesitations, ensuring that the complexity of their rule is not lost to time. He is the keeper of the logbook, and he takes immense pride in his ink-stained hands."
+              }
+            ],
+            presets: {
+              care: { title: 'Empathic Resonator', match: 'Riftmark', altMatch: 'Mnemos' },
+              power: { title: 'Order Executor', match: 'Riftmark', altMatch: 'Plumaria' },
+              memory: { title: 'History Bearer', match: 'Mnemos', altMatch: 'Plumaria' },
+              express: { title: 'Aesthetic Architect', match: 'Plumaria', altMatch: 'Mnemos' },
+            },
+            council: [
+              { id: 1, topic: 'Review of Nesting Qualifications for Candidate A-702', status: 'Archived', details: `Time: 2056/06/08 14:00\nAttendees: Matriarch, Observer, Nest Inspector\n\n[14:05] Matriarch: "Can this candidate bear the weight of the core nest?"\n[14:25] Inspector: "Structure shifted 2mm in storm simulation. Slight risk."\n[14:40] Ruling: Denied core access. Reassigned to perimeter defense.` },
+              { id: 2, topic: 'Anomaly Assessment of Worker Sequence B-9', status: 'Processing', details: `Time: 2056/06/12 09:00\n\n[09:06] System: "Hesitation of 0.3s detected during feeding. 'Private emotion' impurity found."\n[09:20] Ruling: 0.5% risk to stability. Transfer to resource transport immediately.` },
+              { id: 3, topic: 'Entry Qualification for Outsider H-3', status: 'Monitoring', details: `Time: 2056/06/15 Sunset\n\n[18:05] Guard: "He lingered for three days. Brought fresh prey. No aggression."\n[18:20] Ruling: Allowed in perimeter. Status below youngest cub.` },
+              { id: 4, topic: 'Proposal for "Scent Memory" Curriculum', status: 'New', details: `Time: 2056/06/20\nProposer: Mnemonic Elder\n\n[09:00] Elder: "The young rely too much on sight. They must learn the scent map of the currents."` },
+              { id: 5, topic: 'Cross-Species Care: Abandoned Dolphin Calf', status: 'Urgent', details: `Time: 2056/06/21\n\nReport: Lost calf found.\nAction: Mnemos accepts care. Riftmark provides escort.` },
+              { id: 6, topic: 'Protest Regarding Pigment Allocation', status: 'Denied', details: `Time: 2056/06/22\n\nIssue: Young males protest lack of blue pigment.\nRuling: Pigment reserved for camouflage defense. Use natural feathers.` }
+            ],
+            routes: [
+              'Transporting High-Energy Nutrient Fluid', 'Exchanging Parenting Data', 'Requesting Defensive Support', 'Delivering Calming Spices',
+              'Temporary Larval Fostering', 'Cross-Species Gene Comparison', 'Elder Hospice Care', 'Emergency Medical Deployment',
+              'Sharing Monsoon Warnings', 'Supplying Nest Repair Materials', 'Exchanging Deep Sea Minerals', 'Dispatching Psych-Counselors'
+            ]
+        };
+
+        // 🇨🇳 Chinese Content
+        const CHINESE_CONTENT = {
+            ui: {
+              enter: "〔 接受邀请 〕",
+              home: "家园",
+              backMap: "回到世界地图",
+              viewPaper: "查看今日报纸",
+              askEnter: "你希望以哪种身份进入这个世界？",
+              identityQ: "你希望以哪种身份进入这个世界？",
+              traitQ: "你目前更接近哪种生活方向？",
+              male: "男性",
+              female: "女性",
+              nonBinary: "非二元 / 性别酷儿",
+              undefined: "尚未定义",
+              noAnswer: "不作回答",
+              
+              letterTitle: "《来自母系乌托邦世界的邀请函》",
+              letterContent: [
+                "亲爱的访客意识体：",
+                "当你展开这封信的瞬间，这个世界已经开始运转。",
+                "这个世界不是一个国家，而是由三个不同的社会组成的联盟。",
+                "它们都以母系原则为基础，但运作方式各不相同。每个国家都基于不同的生命逻辑与感知体系发展出自身的结构。"
+              ],
+              letterNations: [
+                "这个联盟并非为了让女性取代男性。它的目标是避免重复父权历史中形成的不平等法律、制度与等级。",
+                "在这里，母系并不意味着权力集中于顶端，而是权力被分散，责任被共享，并在关系中流动。",
+                "这个社会并不将少数者的感知视为缺陷或例外。通过“成为-女性”“成为-少数者”“成为-动物”的过程，它肯定他者的力量，并接受自我可能被改变的可能性。"
+              ],
+              
+              traitDisclaimer: "这个世界肯定母系社会，但并不排斥男性。它不是交换统治的位置，而是试图超越统治本身。",
+              traitDisclaimer2: "认同这一理念、愿意探索更平等关系与感知方式的男性，同样受到欢迎。",
+              traitDisclaimer3: "你不需要选择国家。感知系统将引导你前往与你当前状态最接近的地方。",
+              traitDisclaimer4: "在进入之前，我们需要确认你希望如何与这个世界建立关系。",
+              traitDisclaimer5: "这些选择不会决定你的去向，它们只影响这个世界如何与你相遇。",
+              traitDisclaimer6: "如果你愿意接受这份邀请，你将能够进入这个世界。",
+              
+              module1: "感知与能力",
+              module2: "生殖权议事厅",
+              module3: "跨国照护网络",
+              perceptionTitle: "感知能力档案",
+              councilTitle: "生殖权议事厅",
+              networkTitle: "跨国照护网络",
+              identityVerified: "身份已认证",
+              duty: "你的义务",
+              systemAdvice: "系统评估建议",
+              matchText: "根据您的数值矩阵，您与 {match} 的社会结构高度契合。",
+              altMatchText: "潜在适配：您的某些特质（如 {title}）也显示出对 {altMatch} 的适应性。",
+              backList: "← 返回议题列表",
+              routeInfo: "照护航线",
+              networkStats: "当前活跃照护线路：{count} 条 | 资源流动效率：98.5%",
+              openInvite: "点击开启",
+              
+              traits: {
+                express: '装饰、表达与魅力',
+                power: '力量与行动',
+                memory: '记忆与经验'
+              },
+              abilityLabels: {
+                emotion: '情绪感知 (Emotion)',
+                rhythm: '节律稳定 (Rhythm)',
+                relation: '关系敏感 (Relation)',
+                space: '空间感知 (Space)',
+                scent: '气味记忆 (Scent)',
+                conflict: '冲突敏感 (Conflict)'
+              },
+              createChar: "创造角色",
+              chat: "对话",
+              storyPrompt: "请创造你的OC (Own Character)",
+              storyPlaceholder: "请描述你的OC：他是什么性格、什么职业、是否有伴侣、是否有过后代、有怎样的生活背景、经历了什么...",
+              chatPlaceholder: "说点什么...",
+              sending: "思考中...",
+              creatorTitle: "躯体拼贴与灵魂注入",
+              locationSelect: "选择定居区域",
+              locations: ["羽择国 · 首都核心区", "羽择国 · 边境交易所", "裂识国 · 静谧荒野", "忆行国 · 深海记忆库"],
+              
+              ocGuideTitle: "Create Your Own Character (OC)",
+              ocGuideText: [
+                  "在理想的母系社会，你觉得美是什么样的？",
+                  "请按步骤创造一个你自己的 OC (Own Character)。",
+                  "左侧为参考示意图，当然你也可以随意发挥，做成怪物的样子。",
+                  "在这里，形态是流动的，只要灵魂认同，外表皆为自由。"
+              ],
+              collageTitle: "拼贴素材",
+              
+              // NPC Stats Labels
+              labelHeight: "身高",
+              labelAge: "年龄",
+              labelGender: "性别",
+              labelStatus: "关系状态",
+              labelPersonality: "性格特征",
+              dialogue: {
+                  you: "你",
+                  end: "结束对话"
+              }
+            },
+            nations: {
+              bird: {
+                name: 'Ⅰ｜羽择国 (Plumaria)', sub: '雌性选择中心国家', desc: '基于“展示与承担”契约的审美社会',
+                content: `
+                  <div class="font-mono text-sm leading-relaxed text-[#292524]">
+                      <div class="border-b-2 border-[#78350f] pb-4 mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                           <span class="bg-[#292524] text-[#dcd0bb] px-2 py-1 font-bold">【第一部分：国家概论】</span>
+                           <span class="text-xs tracking-widest opacity-60">REF: PLM-01</span>
+                        </div>
+                        <p class="mb-2"><span class="text-[#be123c] font-bold">🦚 灵感来源：</span> 极乐鸟 / 园丁鸟</p>
+                        
+                        <div class="pl-4 border-l-2 border-[#a8a29e] mb-4">
+                           <strong class="block text-[#78350f] mb-1">权力结构：</strong>
+                           <p>这里的最高权力属于“选择者”（雌性）。雄性并不通过暴力争夺配偶，而是通过进化出极端的“美”——巨大的尾羽、繁复的舞蹈、甚至是搭建完美的巢穴——来证明基因的优越。</p>
+                        </div>
+                        
+                        <div class="pl-4 border-l-2 border-[#a8a29e]">
+                           <strong class="block text-[#78350f] mb-1">身体逻辑：</strong>
+                           <p>“美”在这里不是为了享乐，而是为了证明能力的冗余。一个雄性如果能背负沉重的装饰物依然在丛林中生存，说明他足够强壮。美，即是力量的证明。</p>
+                        </div>
+                      </div>
+
+                      <div class="relative bg-[#f5f5f4] p-4 border border-[#a8a29e] shadow-inner">
+                        <div class="absolute -top-3 -right-3 secret-stamp">已驳回</div>
+                        <div class="mb-2 font-bold text-[#78350f] border-b border-[#a8a29e] pb-1">【第二部分：内部档案】</div>
+                        <div class="text-xs font-bold mb-2">📂 档案类型：皇家筑巢局 · 资格审查驳回函 #8821</div>
+                        
+                        <div class="space-y-2 text-xs font-mono">
+                            <p><span class="opacity-60">申请人：</span> 雄性舞者“云斑”</p>
+                            <p><span class="opacity-60">驳回理由：</span> <br/>“申请人试图通过嫁接 150% 长度的人造尾羽，来掩盖其筑巢地基松动的事实。 在此重申：羽择国不需要只会反光的风筝，我们要的是能抗八级台风的父亲。 你的华丽毫无根基，这是对后代最大的不负责任。”</p>
+                            <p class="mt-2 p-2 bg-[#fee2e2] text-[#991b1b] border border-[#f87171]"><span class="font-bold">判决结果：</span> 剥夺求偶展示权，下放至边境修补防风墙，直到学会如何打地基。</p>
+                        </div>
+                      </div>
+                  </div>`
+              },
+              hyena: {
+                name: 'Ⅱ｜裂识国 (Riftmark)', sub: '去性别识别化国家', desc: '绝对理性与生存效率的铁血秩序',
+                content: `
+                   <div class="font-mono text-sm leading-relaxed text-[#292524]">
+                      <div class="border-b-2 border-[#854d0e] pb-4 mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                           <span class="bg-[#292524] text-[#dcd0bb] px-2 py-1 font-bold">【第一部分：国家概论】</span>
+                           <span class="text-xs tracking-widest opacity-60">REF: RFT-09</span>
+                        </div>
+                        <p class="mb-2"><span class="text-[#b45309] font-bold">🐆 灵感来源：</span> 斑鬣狗社会 / 斯巴达 / 机械飞升</p>
+                        
+                        <div class="pl-4 border-l-2 border-[#a8a29e] mb-4">
+                           <strong class="block text-[#78350f] mb-1">权力结构：</strong>
+                           <p>这是一个由母系氏族绝对统治的军事化社会。在这里，“性别”被视为一种低效率的信息噪音。所有成员无论生理构造，皆以“战士”身份存在。等级在出生那一刻即由血统决定，不可僭越。</p>
+                        </div>
+                        
+                        <div class="pl-4 border-l-2 border-[#a8a29e]">
+                           <strong class="block text-[#78350f] mb-1">身体逻辑：</strong>
+                           <p>身体是执行任务的器械，不是用来表达自我的画布。情感是阻碍反应速度的杂质。在战场上，犹豫 0.1 秒就是死亡，所以我们切除了“犹豫”的器官。</p>
+                        </div>
+                      </div>
+
+                      <div class="relative bg-[#f5f5f4] p-4 border border-[#a8a29e] shadow-inner">
+                        <div class="absolute -top-3 -right-3 secret-stamp border-amber-700 text-amber-700">违规</div>
+                        <div class="mb-2 font-bold text-[#78350f] border-b border-[#a8a29e] pb-1">【第二部分：内部档案】</div>
+                        <div class="text-xs font-bold mb-2">📂 档案类型：战术指挥部 · 违规通报</div>
+                        
+                        <div class="space-y-2 text-xs font-mono">
+                            <p><span class="opacity-60">对象：</span> 第七巡逻小队</p>
+                            <p><span class="opacity-60">违规详情：</span> <br/>“监测到队员在休息间隙，讨论‘如果你出生在羽择国会穿什么颜色的裙子’。这种无意义的假设性对话，浪费了宝贵的 30 秒战术复盘时间，并导致了心率不必要的波动。”</p>
+                            <p class="mt-2 p-2 bg-[#fef3c7] text-[#92400e] border border-[#fcd34d]"><span class="font-bold">指挥官指令：</span> “全员注射二级情绪抑制剂。 记住，你们不需要个性，不需要名字，也不需要性别。你们只需要做一颗坚硬的牙齿，咬碎一切敌人。”</p>
+                        </div>
+                      </div>
+                  </div>`
+              },
+              orca: {
+                name: 'Ⅲ｜忆行国 (Mnemos)', sub: '深海记忆集合体', desc: '以记忆深度决定阶级的智慧政体',
+                content: `
+                   <div class="font-mono text-sm leading-relaxed text-[#292524]">
+                      <div class="border-b-2 border-[#1e3a8a] pb-4 mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                           <span class="bg-[#292524] text-[#dcd0bb] px-2 py-1 font-bold">【第一部分：国家概论】</span>
+                           <span class="text-xs tracking-widest opacity-60">REF: MNM-X3</span>
+                        </div>
+                        <p class="mb-2"><span class="text-[#1d4ed8] font-bold">🐋 灵感来源：</span> 虎鲸 / 大象 / 史官文化</p>
+                        
+                        <div class="pl-4 border-l-2 border-[#a8a29e] mb-4">
+                           <strong class="block text-[#78350f] mb-1">权力结构：</strong>
+                           <p>在这个国家，年长女性掌握核心话语权，因为她们是活着的图书馆。权力不来自体能，而来自脑容量中储存的“生存路径”。</p>
+                        </div>
+                        
+                        <div class="pl-4 border-l-2 border-[#a8a29e]">
+                           <strong class="block text-[#78350f] mb-1">身体逻辑：</strong>
+                           <p>时间是唯一的货币。遗忘是最大的罪恶。领袖的职责是替族群记住那些足以致死的痛苦（如百年前的饥荒、海啸的前兆），从而避开未来的暗礁。皱纹越深，地位越高。</p>
+                        </div>
+                      </div>
+
+                      <div class="relative bg-[#f5f5f4] p-4 border border-[#a8a29e] shadow-inner">
+                        <div class="absolute -top-3 -right-3 secret-stamp border-blue-800 text-blue-800">绝密</div>
+                        <div class="mb-2 font-bold text-[#78350f] border-b border-[#a8a29e] pb-1">【第二部分：内部档案】</div>
+                        <div class="text-xs font-bold mb-2">📂 档案类型：神经皮层扫描 · 绝密医疗记录</div>
+                        
+                        <div class="space-y-2 text-xs font-mono">
+                            <p><span class="opacity-60">对象：</span> 现任主母 穆拉长老</p>
+                            <p><span class="opacity-60">状态：</span> 深度失眠（已持续 72 小时）</p>
+                            <p><span class="opacity-60">记录员笔记：</span> <br/>“长老拒绝使用安眠药物。她坚持要向下一代反复复述一百年前那场海底火山爆发前‘水流变热’的细微触感。 她抓着我的手说：‘如果我睡着了，这段记忆就会褪色；如果我们忘了那个味道，下一次灾难来临时，孩子们就死定了。’</p>
+                            <p class="mt-2 p-2 bg-[#dbeafe] text-[#1e40af] border border-[#93c5fd]"><span class="font-bold">结论：</span> 她的失眠，是保护整个国家的最后一道护盾。”</p>
+                        </div>
+                      </div>
+                  </div>`
+              }
+            },
+            npcs: [
+              // 羽择国 (Bird)
+              { 
+                id: 'b1', name: '羽岚', height: '176', age: '35', gender: '女', relation: '结构审核官', 
+                personality: '冷静、比起美更在乎稳固', 
+                log: "羽岚早就过了看表演只看“漂亮”的年纪。现在，她看的是结构。她记得很清楚，曾有一个雄性，羽毛金光闪闪，但他的巢穴基座在第一场雨后就裂了。从那以后，她更尊重那些花时间在泥土基座上，而不是羽毛尖端的人。她常对年轻的雌性说：“选那个知道怎么补漏的，别只选那个在太阳下发光的。”" 
+              },
+              { 
+                id: 'b2', name: '索羽', height: '168', age: '22', gender: '男', relation: '候选者', 
+                personality: '完美主义、尊重的倾听者', 
+                log: "索羽拿着颜料刷的样子像拿着武器。他不是为了征服，而是为了符合一个他所仰慕的标准。他整天追着主母们问意见，不是为了奉承，而是真心觉得她们的眼光更毒辣。“如果她说这蓝色太冷，”他想，“那世界确实就是太冷了。”他从这种为了让伴侣感到舒适而调整自己的过程中，找到了一种独特的尊严。" 
+              },
+              { 
+                id: 'b3', name: '澄栖', height: '160', age: '29', gender: '女', relation: '社会粘合剂', 
+                personality: '温和、秘密保管者', 
+                log: "澄栖是这个高压社会的安全网。当一个雄性落选，是澄栖递给他毛巾，说：“不是失败，只是不匹配。”她不和任何人竞争。她的权力在于确保那些未被选中的失落不会变成怨恨。她用软言细语和热茶把社群缝合在一起，她坚信情绪劳动才是这个国家的脊梁。" 
+              },
+              // 裂识国 (Hyena)
+              { 
+                id: 'h1', name: '赫娅', height: '182', age: '48', gender: '女', relation: '指挥官', 
+                personality: '无情的效率、隐蔽的关怀', 
+                log: "赫娅表达爱的方式是检查防线。她不拥抱你，她确保你的侧翼有掩护。对她来说，混乱是唯一的敌人。她把年轻雄性看作必须正常运转的齿轮，而不是仆人。她的训斥震耳欲聋，但在她手下，没有一个成员死于可预防的事故。这是她的母性誓言。" 
+              },
+              { 
+                id: 'h2', name: '凯', height: '174', age: '24', gender: '不标注', relation: '感知端点', 
+                personality: '躯体化、超敏锐', 
+                log: "凯活得像一个生物雷达。凯不说句子，只报坐标和感觉。“气压降了，30毫巴。”凯已经超越了性别认同的需求，觉得那是低效率的信息。唯一重要的是身体对威胁的反应速度。凯是这个国家生存本能的最纯粹体现。" 
+              },
+              { 
+                id: 'h3', name: '伊岚', height: '169', age: '31', gender: '男', relation: '已融合', 
+                personality: '谨慎、观察型辅助', 
+                log: "伊岚通过学会解读沉默活了下来。他知道当女性领袖们不说话时，是在处理沉重的数据。他不打断，只是默默准备好她们开口时需要的物资。他不把这看作顺从，而是一种专业能力。“她们掌舵，”他说，“我负责给引擎上油。我们都在让这艘船浮着。”" 
+              },
+              // 忆行国 (Orca)
+              { 
+                id: 'o1', name: '穆拉', height: '158', age: '67', gender: '女', relation: '遗孀/长者', 
+                personality: '活着的图书馆、务实', 
+                log: "穆拉背负着一个世纪的重量。她坚持复述那些饥荒和丧失的故事，不是为了让年轻人抑郁，而是为了给他们接种疫苗。她把记忆看作航海图。她对遗忘者很严厉，因为在深海，忘掉洋流就意味着死亡。她的皱纹是这个国家的生存指南页。" 
+              },
+              { 
+                id: 'o2', name: '伊诺', height: '170', age: '26', gender: '女', relation: '继承者', 
+                personality: '焦虑、勤勉', 
+                log: "伊诺最怕的就是弄丢了火种。她像影子一样跟着穆拉，嘴唇默念着长者的每一个字。她担心自己这一代太软弱，太分心。每晚，她都对着星星背诵家族谱系，祈祷自己的大脑能成为一个不漏水的容器，盛住真理。" 
+              },
+              { 
+                id: 'o3', name: '塔林', height: '165', age: '34', gender: '男', relation: '记录员', 
+                personality: '安静、档案保管员', 
+                log: "塔林在背景中找到了平静。当主母们辩论决策时，他负责记录。他相信在这个世界，男性的力量最好用来保存女性的智慧。他连分歧和犹豫都记下来，确保她们统治的复杂性不会随时间流逝。他是航海日志的保管人，他为自己沾满墨水的手感到无比自豪。" 
+              }
+            ],
+            presets: {
+              care: { title: '共情共振者', match: '裂识国', altMatch: '忆行国 (防御性照护潜力)' },
+              power: { title: '秩序执行者', match: '裂识国', altMatch: '羽择国' },
+              memory: { title: '历史承载者', match: '忆行国', altMatch: '羽择国 (仪式记录员)' },
+              express: { title: '美学构建者', match: '羽择国', altMatch: '忆行国 (情感传颂者)' },
+            },
+            council: [
+              { id: 1, topic: '关于候选雄性 A-702 的筑巢资格审查', status: '已归档', details: `会议时间：2056年6月8日 下午 14:00\n参会人员：首领、资深观察员、巢穴检验官\n\n[14:05] 首领提问：“这个候选雄性能否承担核心区域的筑巢责任？他的羽色是否显示出足够的健康储备？”\n[14:10] 观察员汇报：“经评估，其装饰物收集能力在前 10%，蓝色羽毛光泽度达标。”\n[14:25] 检验官补充：“但他搭建的基座在模拟风暴测试中出现了 2mm 的位移。虽然微小，但对幼雏安全构成潜在风险。”\n[14:40] 讨论结果：鉴于责任风险，不建议赋予其核心区筑巢权。\n[14:45] 最终建议：降级至外围协作者，负责外围防御性装饰搭建。` },
+              { id: 2, topic: '工蜂序列 B-9 情绪波动异常评估', status: '处理中', details: `会议时间：2056年6月12日 上午 09:00\n参会人员：蜂后代理、系统算法、照护长\n\n[09:05] 蜂后代理：“这个成员适合参与幼体照护吗？他的信息素波动是否平稳？昨日数据有异常。”\n[09:06] 系统：“检测到 B-9 在昨日喂食时出现了 0.3 秒的犹豫，信息素中检出‘私人情感’杂质。”\n[09:15] 照护长：“这种犹豫可能导致喂食效率下降，甚至影响幼体对‘集体’的纯粹认知。”\n[09:20] 讨论结果：判定对系统稳定造成 0.5% 风险。\n[09:22] 最终建议：驳回照护申请，即刻调往资源运输线，切断其与幼体接触。` },
+              { id: 3, topic: '外来雄性 H-3 的入群资格判定', status: '监控中', details: `会议时间：2056年6月15日 日落时分\n参会人员：主母、狩猎先锋、边界守卫\n\n[18:00] 主母：“该雄性是否被核心母系链条允许进入？谁为他的忠诚担保？”\n[18:05] 守卫：“他在边界徘徊了三日，没有攻击幼崽的迹象，且带来了新鲜的猎物。”\n[18:10] 先锋：“猎物质量尚可，但体格不够强壮。建议测试其耐力。”\n[18:20] 讨论结果：允许其在最外围停留，但地位低于最小的幼崽。\n[18:25] 最终建议：观察其在下一次风暴中的表现，若逃跑则驱逐。` },
+              { id: 4, topic: '关于增加“气味记忆”课程的提案', status: '新议案', details: `会议时间：2056年6月20日\n提案人：忆行国长老代表\n\n[09:00] 长老：“现在的幼崽过度依赖视觉，正在丧失对洋流气味的辨识力。建议在幼教阶段强制加入气味图谱训练。”\n[09:15] 育序国代表：“这会占用目前的结构工程学课时，需要重新评估优先级。”` },
+              { id: 5, topic: '跨物种抚育：被遗弃海豚幼崽的归属', status: '紧急', details: `会议时间：2056年6月21日\n\n[10:00] 报告：一只迷途海豚幼崽被发现于羽择国海岸。\n[10:10] 讨论：羽择国缺乏水下抚育设施。忆行国同意接收，并由裂识国护卫队负责沿途护送。` },
+              { id: 6, topic: '关于装饰物分配不均的抗议', status: '驳回', details: `会议时间：2056年6月22日\n\n[14:00] 部分年轻雄性抗议蓝色颜料分配不足，影响求偶展示。\n[14:30] 裁决：颜料优先供应给承担防御任务的伪装者。求偶装饰建议使用天然脱落的羽毛替代。` }
+            ],
+            routes: [
+              '输送高能营养液', '交换抚育经验数据', '请求防御力量支援', '运送情绪安抚香料',
+              '幼体临时寄养', '跨物种基因库比对', '老年个体临终关怀', '紧急医疗队调动',
+              '分享季风气候预警', '支援巢穴修补材料', '互换深海矿物资源', '派遣心理疏导员'
+            ]
+        };
+
+        const TEXT = {
+            en: ENGLISH_CONTENT,
+            zh: CHINESE_CONTENT
+        };
+
+        // ============================================================================
+        // 🏭 Logic
+        // ============================================================================
+
+        const getNations = (lang) => {
+          const selectedLang = (TEXT[lang]) ? lang : 'en';
+          const t = TEXT[selectedLang].nations;
+          return {
+            bird: { ...t.bird, id: 'bird', x: 50, y: 50, color: '#be123c', npcImage: IMG_NPC_BIRD, flag: FLAG_BIRD },
+            hyena: { ...t.hyena, id: 'hyena', x: 75, y: 38, color: '#854d0e', npcImage: IMG_NPC_HORSE, flag: FLAG_HYENA },
+            orca: { ...t.orca, id: 'orca', x: 33, y: 35, color: '#1e3a8a', npcImage: IMG_NPC_FISH, flag: FLAG_ORCA }
+          };
+        };
+
+        const getNpcPins = (lang) => {
+          const selectedLang = (TEXT[lang]) ? lang : 'en';
+          const t = TEXT[selectedLang].npcs || []; 
+          const positions = {
+            b1: { x: 50, y: 48, image: IMG_NPC_BIRD },
+            b2: { x: 46, y: 52, image: IMG_NPC_BIRD },
+            b3: { x: 54, y: 52, image: IMG_NPC_BIRD },
+            h1: { x: 75, y: 38, image: IMG_NPC_HORSE },
+            h2: { x: 80, y: 36, image: IMG_NPC_HORSE },
+            h3: { x: 78, y: 42, image: IMG_NPC_HORSE },
+            o1: { x: 33, y: 35, image: IMG_NPC_FISH },
+            o2: { x: 29, y: 38, image: IMG_NPC_FISH },
+            o3: { x: 36, y: 38, image: IMG_NPC_FISH }
+          };
+          return t.map(n => ({ ...n, ...positions[n.id] }));
+        };
+
+        const getCouncilLogs = (lang) => {
+          const selectedLang = (TEXT[lang]) ? lang : 'en';
+          const t = TEXT[selectedLang].council || [];
+          return t.map(c => ({ ...c, date: c.details?.split('\n')[0].split('：')[1] || '2056/06/08', nationId: 'bird' }));
+        };
+        
+        const TRAIT_KEYS = { 'express': 'bird', 'power': 'hyena', 'memory': 'orca' };
+        
+        const getAbilityPresets = (lang) => {
+          const selectedLang = (TEXT[lang]) ? lang : 'en';
+          const t = TEXT[selectedLang].presets || {};
+          return {
+            'care': { ...t.care, scores: { emotion: 95, rhythm: 80, relation: 90, space: 40, scent: 85, conflict: 70 } },
+            'power': { ...t.power, scores: { emotion: 40, rhythm: 60, relation: 50, space: 90, scent: 70, conflict: 95 } },
+            'memory': { ...t.memory, scores: { emotion: 70, rhythm: 50, relation: 80, space: 60, scent: 95, conflict: 40 } },
+            'express': { ...t.express, scores: { emotion: 90, rhythm: 95, relation: 85, space: 50, scent: 60, conflict: 30 } },
+          };
+        };
+
+        // Random stats generator
+        const generateRandomStats = (baseStats) => {
+            if (!baseStats) return null;
+            const newScores = {};
+            Object.keys(baseStats.scores).forEach(key => {
+                const base = baseStats.scores[key];
+                const variance = Math.floor(Math.random() * 30) - 15; 
+                newScores[key] = Math.max(10, Math.min(100, base + variance));
+            });
+            return { ...baseStats, scores: newScores };
+        };
+
+        const generateDenseRoutes = (lang) => {
+          const nodes = [
+            { id: 'bird', x: 200, y: 175, name: 'Plumaria' },
+            { id: 'hyena', x: 300, y: 133, name: 'Riftmark' },
+            { id: 'orca', x: 132, y: 122.5, name: 'Mnemos' }
+          ];
+          let routes = [];
+          const selectedLang = (TEXT[lang]) ? lang : 'en';
+          const interactions = TEXT[selectedLang].routes || [];
+          const tales = ROUTE_TALES[selectedLang] || ROUTE_TALES['en'];
+
+          for (let i = 0; i < 50; i++) {
+            const start = nodes[Math.floor(Math.random() * nodes.length)];
+            let end = nodes[Math.floor(Math.random() * nodes.length)];
+            while (start.id === end.id) end = nodes[Math.floor(Math.random() * nodes.length)];
+
+            const key = `${start.id}_${end.id}`;
+            const stories = tales[key] || interactions;
+            const story = stories[Math.floor(Math.random() * stories.length)];
+            const cpX = (start.x + end.x) / 2 + (Math.random() - 0.5) * 50;
+            const cpY = (start.y + end.y) / 2 + (Math.random() - 0.5) * 50;
+            routes.push({ id: i, start, end, cpX, cpY, width: Math.random() * 2 + 1, opacity: Math.random() * 0.5 + 0.3, desc: story });
+          }
+          return routes;
+        };
+
+        // ============================================================================
+        // 🎨 Character Creator
+        // ============================================================================
+
+        const CharacterCreator = ({ onClose, onFinish, lang }) => {
+            const [step, setStep] = useState(1);
+            const [formData, setFormData] = useState({ nation: null, gender: 'female', bodyShape: null, name: '', backstory: '', location: '' });
+            const [fabricCanvas, setFabricCanvas] = useState(null);
+            const [finalImage, setFinalImage] = useState(null);
+            const [hoverSol, setHoverSol] = useState(false);
+            const [hoverFlag, setHoverFlag] = useState(null); 
+            const [isSaving, setIsSaving] = useState(false);
+            
+            const selectedLang = (TEXT[lang]) ? lang : 'en';
+            const t = TEXT[selectedLang].ui;
+            const nations = getNations(lang);
+
+            useEffect(() => {
+                if (step === 4 && !fabricCanvas) {
+                    const canvas = new window.fabric.Canvas('c', { width: 320, height: 450, backgroundColor: '#dcd0bb' });
+                    setFabricCanvas(canvas);
+                    
+                    const bodyUrl = formData.bodyShape;
+                    if (bodyUrl) {
+                        window.fabric.Image.fromURL(bodyUrl, (img) => {
+                            if(img) {
+                                const scale = 300 / img.height; 
+                                img.set({
+                                    scaleX: scale,
+                                    scaleY: scale,
+                                    left: 160, 
+                                    top: 225,  
+                                    originX: 'center',
+                                    originY: 'center',
+                                    selectable: false,
+                                    opacity: 0.8
+                                });
+                                canvas.add(img);
+                                canvas.sendToBack(img);
+                            }
+                        }, { crossOrigin: 'anonymous' });
+                    }
+                }
+            }, [step]);
+
+            const addAsset = (url) => {
+                if (!fabricCanvas) return;
+                window.fabric.Image.fromURL(url, (img) => {
+                    img.scaleToWidth(100);
+                    img.set({ left: 100, top: 100 });
+                    fabricCanvas.add(img);
+                    fabricCanvas.setActiveObject(img);
+                }, { crossOrigin: 'anonymous' });
+            };
+
+            const handleUpload = (e) => {
+                const file = e.target.files[0];
+                if(!file || !fabricCanvas) return;
+                const reader = new FileReader();
+                reader.onload = (f) => {
+                    window.fabric.Image.fromURL(f.target.result, (img) => {
+                        img.scaleToWidth(100);
+                        img.set({ left: 100, top: 100 });
+                        fabricCanvas.add(img);
+                        fabricCanvas.setActiveObject(img);
+                    });
+                };
+                reader.readAsDataURL(file);
+            };
+
+            const deleteActiveObject = () => {
+                if (!fabricCanvas) return;
+                const activeObjects = fabricCanvas.getActiveObjects();
+                if (activeObjects.length) {
+                    fabricCanvas.discardActiveObject();
+                    activeObjects.forEach((obj) => {
+                        fabricCanvas.remove(obj);
+                    });
+                }
+            };
+
+            const moveLayer = (direction) => {
+                if (!fabricCanvas) return;
+                const activeObj = fabricCanvas.getActiveObject();
+                if (activeObj) {
+                    if (direction === 'up') activeObj.bringForward();
+                    else activeObj.sendBackwards();
+                    fabricCanvas.renderAll();
+                }
+            };
+            const generatePreview = () => {
+                if (fabricCanvas) {
+                    const originalBg = fabricCanvas.backgroundColor;
+                    fabricCanvas.setBackgroundColor(null, () => {
+                        const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 1.0 });
+                        setFinalImage(dataURL);
+                        setStep(6);
+                        fabricCanvas.setBackgroundColor(originalBg, () => fabricCanvas.renderAll());
+                    });
+                }
+            };
+            
+            const saveCharacter = async () => {
+                if (isSaving) return;
+                setIsSaving(true);
+                
+                try {
+                    const nationBase = nations[formData.nation];
+                    let offsetX = (Math.random() - 0.5) * 20; 
+                    let offsetY = (Math.random() - 0.5) * 20;
+                    if (Math.abs(offsetX) < 5) offsetX = offsetX > 0 ? 5 : -5; 
+                    if (Math.abs(offsetY) < 5) offsetY = offsetY > 0 ? 5 : -5;
+                    
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert("Please wait for authentication initialization...");
+                        setIsSaving(false);
+                        return;
+                    }
+
+                    const charId = Date.now().toString();
+                    
+                    // 1. UPDATED: Save Image Directly to Firestore (No Storage Bucket needed)
+                    // We use finalImage directly which is a Base64 string
+                    
+                    // 2. Save Data to Firestore
+                    const newChar = {
+                        id: charId,
+                        ...formData,
+                        imageUrl: finalImage, // Storing the Base64 string directly
+                        nationName: nationBase.name,
+                        createdAt: new Date().toISOString(),
+                        userId: user.uid,
+                        x: Math.max(5, Math.min(95, nationBase.x + offsetX)),
+                        y: Math.max(5, Math.min(95, nationBase.y + offsetY)),
+                    };
+
+                    await db.collection('characters').add(newChar);
+                    console.log("Character saved to Firebase.");
+                    onFinish(newChar);
+                } catch (err) {
+                    console.error("Save error", err);
+                    alert("Failed to save character. Please try again.");
+                } finally {
+                    setIsSaving(false);
+                }
+            };
+
+            return (
+                <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 font-serif text-[#dcd0bb]">
+                    <div className="w-[95vw] h-[90vh] bg-[#292524] border-2 border-[#7f1d1d] flex flex-col relative shadow-[0_0_50px_rgba(127,29,29,0.3)]">
+                        <button onClick={onClose} className="absolute top-4 right-4 z-50 hover:text-white"><X/></button>
+                        
+                        <div className="p-4 border-b border-[#5c4a3d] bg-[#1c1917] text-center flex justify-between items-center px-8">
+                            <span className="text-xs text-[#78350f] uppercase tracking-widest">Step {step} / 7</span>
+                             <h2 className="text-xl font-bold tracking-widest text-[#dcd0bb]">{t.creatorTitle}</h2>
+                            <div className="w-10"></div>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center relative">
+                             {/* Flag Hover Overlay */}
+                             {hoverFlag && (
+                                <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] animate-unfold pointer-events-none">
+                                    <img src={hoverFlag} className="w-[60vw] max-w-[500px] h-auto object-contain drop-shadow-[0_0_50px_rgba(0,0,0,0.8)]" />
+                                </div>
+                             )}
+
+                             {step === 1 && (
+                                <div className="space-y-6 text-center animate-fade-in-up">
+                                    <h3 className="text-2xl text-[#78350f] font-bold">1. Choose a Nation</h3>
+                                    <div className="max-w-2xl w-full bg-[#1c1917]/80 border border-[#5c4a3d] p-6 mb-8 flex flex-col md:flex-row items-center gap-6 rounded shadow-xl">
+                                        <img src={IMG_NPC_SOL} className="w-24 h-32 object-contain border-2 border-[#78350f] bg-[#dcd0bb]/10 rounded" />
+                                        <div className="flex-1 text-left space-y-2">
+                                            <h4 className="text-[#be123c] font-bold text-lg">{t.ocGuideTitle}</h4>
+                                            <div className="text-sm text-[#dcd0bb] leading-relaxed italic opacity-80">
+                                                {t.ocGuideText.map((text, i) => <p key={i}>{text}</p>)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4 max-w-2xl w-full">
+                                        {Object.values(nations).map(n => (
+                                             <button 
+                                                key={n.id} 
+                                                onClick={() => { setFormData({...formData, nation: n.id}); setStep(2); setHoverFlag(null); }} 
+                                                className="p-6 border border-[#5c4a3d] hover:bg-[#7f1d1d] text-left transition-all hover:border-[#fca5a5] group relative overflow-hidden flex flex-col items-start"
+                                             >
+                                                <div className="font-bold text-lg mb-1 group-hover:text-white relative z-10 flex items-center gap-2">
+                                                    {n.name}
+                                                </div>
+                                                 <div className="text-xs opacity-60 group-hover:opacity-100 relative z-10">{n.desc}</div>
+                                            </button>
+                                         ))}
+                                    </div>
+                               </div>
+                            )}
+                            {step === 2 && (
+                                <div className="space-y-8 text-center animate-fade-in-up">
+                                    <h3 className="text-2xl text-[#78350f] font-bold">2. Select Form Base</h3>
+                                    <div className="flex gap-8 justify-center">
+                                        {['female', 'male'].map(g => (
+                                             <button key={g} onClick={() => { setFormData({...formData, gender: g}); setStep(3); }} className="w-40 h-40 border border-[#5c4a3d] hover:bg-[#7f1d1d] flex items-center justify-center text-xl uppercase tracking-widest hover:border-[#fca5a5]">{t[g]}</button>
+                                        ))}
+                                     </div>
+                                    <button onClick={() => setStep(1)} className="text-xs underline opacity-50 hover:opacity-100">Back</button>
+                                </div>
+                            )}
+                            {step === 3 && (
+                                <div className="space-y-8 text-center animate-fade-in-up">
+                                    <h3 className="text-2xl text-[#78350f] font-bold">3. Select Silhouette ({formData.gender})</h3>
+                                    <div className="flex flex-wrap gap-6 justify-center">
+                                        {Object.entries(BODY_SHAPES[formData.gender]).map(([key, url]) => (
+                                             <div key={key} onClick={() => { setFormData({...formData, bodyShape: url}); setStep(4); }} className="cursor-pointer group relative">
+                                                <div className="w-32 h-48 border border-[#5c4a3d] bg-[#dcd0bb] flex items-center justify-center overflow-hidden group-hover:border-[#7f1d1d]">
+                                                     <img src={url} className="h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
+                                                 </div>
+                                                <div className="mt-2 text-xs uppercase tracking-widest group-hover:text-[#be123c] text-center">{key}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                     <button onClick={() => setStep(2)} className="text-xs underline opacity-50 hover:opacity-100">Back</button>
+                                </div>
+                            )}
+                             {step === 4 && (
+                                <div className="flex w-full h-full gap-6 animate-fade-in-up">
+                                    <div className="w-1/4 min-w-[300px] border-r border-[#5c4a3d] flex flex-col h-full overflow-hidden">
+                                        <div className="flex-1 overflow-y-auto custom-scrollbar pr-4">
+                                            <div className="p-4 bg-[#1c1917]/90 border-b border-[#5c4a3d] mb-4 relative overflow-hidden group">
+                                                <div className="absolute inset-0 border border-[#78350f] opacity-30 m-1 pointer-events-none"></div>
+                                                <h4 className="text-[#78350f] font-bold text-sm mb-2 uppercase tracking-widest text-center border-b border-[#5c4a3d]/50 pb-1">Creation Guide</h4>
+                                                <div className="flex gap-3 items-start relative">
+                                                    <div className="relative cursor-pointer" 
+                                                         onMouseEnter={() => setHoverSol(true)} 
+                                                         onMouseLeave={() => setHoverSol(false)}>
+                                                        <img src={IMG_NPC_SOL} className="w-16 h-24 object-contain border border-[#5c4a3d] bg-[#dcd0bb]/5 rounded flex-shrink-0" />
+                                                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><ZoomIn size={16} className="text-white"/></div>
+                                                    </div>
+                                                    <div className="text-[10px] text-[#dcd0bb] leading-relaxed italic opacity-80 space-y-1">
+                                                        <p className="font-bold text-[#be123c]">{t.ocGuideTitle}</p>
+                                                        {t.ocGuideText.map((text, i) => <p key={i}>{text}</p>)}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h3 className="font-bold mb-4 text-[#be123c] text-xl border-b border-[#5c4a3d] pb-2 pt-2">{t.collageTitle}</h3>
+                                            <div className="mb-6 space-y-4 p-4 border border-dashed border-[#5c4a3d] text-center">
+                                                <label className="cursor-pointer block bg-[#292524] text-[#dcd0bb] py-2 px-1 text-xs border border-[#5c4a3d] hover:bg-[#78350f]">
+                                                    <span>+ Upload Image</span>
+                                                    <input type="file" onChange={handleUpload} className="hidden" />
+                                                </label>
+                                            </div>
+                                            {Object.entries(COLLAGE_ASSETS).map(([cat, urls]) => (
+                                                <div key={cat} className="mb-6">
+                                                    <div className="grid grid-cols-3 gap-2">
+                                                        {urls.map((u, i) => (
+                                                            <img key={i} src={u} onClick={() => addAsset(u)} className="w-full h-20 object-contain bg-[#dcd0bb]/10 border border-transparent hover:border-[#be123c] cursor-pointer" />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    {hoverSol && (
+                                        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] animate-unfold pointer-events-none">
+                                            <img src={IMG_NPC_SOL} className="h-[80vh] w-auto object-contain animate-float drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]" />
+                                        </div>
+                                    )}
+
+                                    <div className="flex-1 flex flex-col items-center justify-center bg-[#18181b] relative">
+                                        <div className="text-xs absolute top-4 opacity-50">Drag, scale, and rotate. Use buttons to layer.</div>
+                                        <div className="border-[10px] border-[#292524] shadow-2xl"><canvas id="c" /></div>
+                                        <div className="mt-6 flex gap-4 w-full justify-center">
+                                             <button onClick={() => setStep(3)} className="px-6 py-2 border border-[#5c4a3d] hover:bg-[#292524]">Back</button>
+                                            <button onClick={() => moveLayer('up')} className="px-4 py-2 bg-[#5c4a3d] hover:bg-[#78350f]"><ArrowUp/></button>
+                                             <button onClick={() => moveLayer('down')} className="px-4 py-2 bg-[#5c4a3d] hover:bg-[#78350f]"><ArrowDown/></button>
+                                            <button onClick={deleteActiveObject} className="px-6 py-2 border border-[#5c4a3d] hover:text-red-500 bg-[#292524] flex items-center gap-2"><Trash size={16}/> Delete</button>
+                                            <button onClick={() => fabricCanvas?.clear()} className="px-6 py-2 border border-[#5c4a3d] hover:text-red-500">Reset</button>
+                                            <button onClick={generatePreview} className="px-10 py-2 bg-[#7f1d1d] text-white font-bold tracking-widest hover:bg-[#9f1239] shadow-lg">FINISH</button>
+                                        </div>
+                                     </div>
+                                </div>
+                            )}
+                             {step === 6 && (
+                                <div className="text-center animate-fade-in-up">
+                                    <h3 className="text-2xl text-[#dcd0bb] mb-6">Form Generated</h3>
+                                    <img src={finalImage} className="h-64 mx-auto border-4 border-[#5c4a3d] shadow-2xl mb-8 bg-transparent" />
+                                     <div className="flex gap-4 justify-center">
+                                        <button onClick={() => setStep(4)} className="px-6 py-2 border border-[#5c4a3d] hover:bg-[#292524]">Edit Form</button>
+                                         <button onClick={() => setStep(7)} className="px-10 py-2 bg-[#7f1d1d] text-white font-bold tracking-widest hover:bg-[#9f1239]">INJECT SOUL &rarr;</button>
+                                    </div>
+                                </div>
+                             )}
+                            {step === 7 && (
+                                <div className="flex gap-8 w-full max-w-4xl animate-fade-in-up">
+                                     <div className="w-1/3">
+                                        <img src={finalImage} className="w-full border-4 border-[#5c4a3d] bg-transparent" />
+                                    </div>
+                                    <div className="flex-1 space-y-6">
+                                         <div><label className="block text-sm text-[#be123c] mb-1 font-bold">Name</label><input value={formData.name} onChange={e=>setFormData({...formData, name: e.target.value})} className="w-full bg-[#1c1917] border border-[#5c4a3d] p-3 text-xl focus:border-[#be123c] outline-none text-[#dcd0bb]"/></div>
+                                        <div>
+                                             <label className="block text-sm text-[#be123c] mb-1 font-bold">{t.locationSelect}</label>
+                                            <select value={formData.location} onChange={e=>setFormData({...formData, location: e.target.value})} className="w-full bg-[#1c1917] border border-[#5c4a3d] p-3 text-[#dcd0bb] outline-none">
+                                                 <option value="">-- Choose a Region --</option>
+                                                {t.locations.map(l => <option key={l} value={l}>{l}</option>)}
+                                             </select>
+                                        </div>
+                                         <div>
+                                            <label className="block text-sm text-[#be123c] mb-1 font-bold">{t.storyPrompt}</label>
+                                             <textarea value={formData.backstory} onChange={e=>setFormData({...formData, backstory: e.target.value})} placeholder={t.storyPlaceholder} className="w-full h-32 bg-[#1c1917] border border-[#5c4a3d] p-3 focus:border-[#be123c] outline-none text-[#dcd0bb]"/>
+                                        </div>
+                                         <button onClick={saveCharacter} disabled={!formData.name || isSaving} className="w-full py-4 bg-[#7f1d1d] text-white font-bold text-xl tracking-[0.2em] hover:bg-[#9f1239] disabled:opacity-50 shadow-xl mt-4">
+                                             {isSaving ? "SAVING TO ARCHIVES..." : "ENTER THE WORLD"}
+                                         </button>
+                                    </div>
+                                </div>
+                             )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const InvitationPhase = ({ onEnter, lang }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const [form, setForm] = useState({ body: '', trait: '' });
+            const selectedLang = (TEXT[lang]) ? lang : 'en';
+            const t = TEXT[selectedLang].ui;
+            return (
+               <div className="fixed inset-0 bg-[#0c0a09] flex items-center justify-center font-serif overflow-hidden">
+                  {!isOpen ? (
+                    <div onClick={() => setIsOpen(true)} className="relative w-[300px] h-[200px] bg-[#3f2e22] cursor-pointer group hover:scale-105 transition-transform duration-500 border-t-2 border-[#5c4a3d] flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
+                      <div className="w-16 h-16 rounded-full bg-[#7f1d1d] border-4 border-[#450a0a] shadow-lg flex items-center justify-center group-hover:bg-[#991b1b] transition-colors"><span className="text-[#fecaca] text-2xl font-bold italic">M</span></div>
+                      <p className="absolute bottom-4 text-[#a89078] text-xs tracking-[0.3em] opacity-70 uppercase">{t.openInvite}</p>
+                    </div>
+                  ) : (
+                     <div className="relative w-[90%] md:w-[600px] max-h-[90vh] bg-[#dcd0bb] shadow-2xl animate-unfold origin-top border-y-[12px] border-[#292524] flex flex-col p-10 custom-scrollbar overflow-y-auto" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/aged-paper.png")' }}>
+                      <h2 className="text-2xl text-center text-[#292524] mb-8 font-bold tracking-widest border-b-2 border-[#292524] pb-4">{t.letterTitle}</h2>
+                      <div className="space-y-6 text-[#292524] text-base leading-relaxed font-medium mb-8">
+                         {t.letterContent.map((p, i) => <p key={i}>{p}</p>)}
+                        <div className="pl-4 border-l-2 border-[#a8a29e] italic text-sm text-[#57534e] space-y-2">
+                           {t.letterNations.map((p, i) => <p key={i}>{p}</p>)}
+                         </div>
+                        <p>{t.traitDisclaimer}</p>
+                        <p>{t.traitDisclaimer2}</p>
+                      </div>
+                      
+                      <div className="space-y-8 bg-[#292524]/5 p-8 border border-[#292524]/10 mb-8">
+                         <div>
+                            <label className="block text-[#78350f] font-bold text-lg mb-4">{t.identityQ}</label>
+                            <div className="flex flex-wrap gap-2">
+                                 {[t.female, t.male, t.nonBinary, t.undefined, t.noAnswer].map(opt => (
+                                    <button key={opt} onClick={() => setForm({...form, body: opt})} className={`px-4 py-2 border ${form.body === opt ? 'bg-[#78350f] text-[#fef3c7] border-[#78350f]' : 'border-[#a8a29e] text-[#57534e]'}`}>○ {opt}</button>
+                                ))}
+                            </div>
+                        </div>
+                         <div><label className="block text-[#78350f] font-bold text-lg mb-4">{t.traitQ}</label><div className="grid grid-cols-1 gap-3">{Object.keys(t.traits).map(key => (<button key={key} onClick={() => setForm({...form, trait: key})} className={`py-3 px-4 text-left border ${form.trait === key ? 'bg-[#78350f]/10 border-[#78350f] font-bold text-[#78350f]' : 'border-transparent hover:bg-[#292524]/5'}`}>○ {t.traits[key]}</button>))}</div></div>
+                      </div>
+                      <div className="text-sm text-[#57534e] space-y-2 mb-8 italic">
+                          <p>{t.traitDisclaimer3}</p>
+                         <p>{t.traitDisclaimer4}</p>
+                         <p>{t.traitDisclaimer5}</p>
+                         <p>{t.traitDisclaimer6}</p>
+                       </div>
+                      <button onClick={() => onEnter(form.trait)} disabled={!form.body || !form.trait} className="w-full bg-[#292524] text-[#dcd0bb] py-4 text-xl tracking-[0.2em] hover:bg-[#78350f] disabled:opacity-50 font-bold">{t.enter}</button>
+                    </div>
+                  )}
+               </div>
+            );
+        };
+
+        const WorldMapPhase = ({ onGoHome, lang, userChars, onChat }) => {
+            const [scale, setScale] = useState(1);
+            const [position, setPosition] = useState({ x: 0, y: 0 });
+            const [activeNation, setActiveNation] = useState(null);
+            const [activeLog, setActiveLog] = useState(null);
+            const [activeUserChar, setActiveUserChar] = useState(null);
+            const [chatState, setChatState] = useState('bio'); 
+            const [chatOption, setChatOption] = useState(null);
+
+            const nations = useMemo(() => getNations(lang), [lang]);
+            const npcs = useMemo(() => getNpcPins(lang), [lang]);
+            const selectedLang = (TEXT[lang]) ? lang : 'en';
+            const t = TEXT[selectedLang].ui;
+            
+            const dialogueData = activeLog ? (NPC_DIALOGUES[lang][activeLog.id] || NPC_DIALOGUES['zh'][activeLog.id]) : null;
+            
+            const getNationFlagForId = (id) => {
+                if (id.startsWith('b')) return nations.bird.flag;
+                if (id.startsWith('h')) return nations.hyena.flag;
+                if (id.startsWith('o')) return nations.orca.flag;
+                return null;
+            };
+
+            const handleStartChat = () => { setChatState('intro'); setChatOption(null); };
+            const handleOptionSelect = (opt) => { setChatOption(opt); setChatState('result'); };
+
+            return (
+                <div className="relative w-full h-screen bg-[#1c1917] overflow-hidden font-serif flex items-center justify-center">
+                    <div className="relative w-full h-full cursor-move transition-transform duration-300 ease-out flex items-center justify-center" style={{ transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)` }} onMouseMove={(e) => { if(e.buttons === 1) setPosition(prev => ({x: prev.x + e.movementX / scale, y: prev.y + e.movementY / scale})); }}>
+                         <div className="relative h-full w-full flex items-center justify-center">
+                            <img src={IMG_MAP_BG} onError={(e) => { if(e.target.src !== IMG_MAP_BACKUP) { e.target.src = IMG_MAP_BACKUP; console.warn("Main map image failed, loading backup."); } }} crossOrigin="anonymous" className="max-w-full max-h-full object-contain shadow-2xl pointer-events-none" />
+                            <div className="absolute inset-0">
+                                 {Object.values(nations).map(n => (
+                                    <div key={n.id} onClick={(e) => {e.stopPropagation(); setActiveNation(n); setActiveLog(null); setActiveUserChar(null); setChatState('bio');}} className="absolute cursor-pointer group hover:-translate-y-2 transition-transform flex flex-col items-center z-30" style={{ left: `${n.x}%`, top: `${n.y}%` }}>
+                                         <MapPin className="text-[#7f1d1d] drop-shadow-xl fill-[#b91c1c] w-12 h-12" strokeWidth={1.5} />
+                                        <div className="absolute -bottom-6 bg-[#292524] text-[#dcd0bb] text-[12px] px-2 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">{n.name}</div>
+                                    </div>
+                                ))}
+                                {npcs.map(n => (
+                                     <div key={n.id} onClick={(e)=>{e.stopPropagation(); setActiveLog(n); setActiveNation(null); setActiveUserChar(null); setChatState('bio');}} className="absolute w-12 h-16 -ml-6 -mt-8 cursor-pointer group hover:scale-110 transition-transform z-20" style={{ left: `${n.x}%`, top: `${n.y}%` }}>
+                                        <div className="absolute inset-0 bg-white/40 blur-xl animate-pulse rounded-full opacity-50 group-hover:opacity-80"></div>
+                                         <img src={n.image} className="relative w-full h-full object-contain drop-shadow-lg filter hover:brightness-110 opacity-80" />
+                                    </div>
+                                ))}
+                                 {userChars.map(c => (
+                                    <div key={c.id} onClick={(e)=>{e.stopPropagation(); setActiveUserChar(c); setActiveNation(null); setActiveLog(null); setChatState('bio');}} className="absolute w-16 h-20 -ml-8 -mt-10 cursor-pointer group hover:scale-110 transition-transform z-20" style={{ left: `${c.x}%`, top: `${c.y}%` }}>
+                                         <div className="absolute -top-6 text-xs bg-[#7f1d1d] text-white px-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">{c.name}</div>
+                                         <img src={c.imageUrl} className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(127,29,29,0.8)] filter hover:brightness-110" />
+                                    </div>
+                                ))}
+                             </div>
+                        </div>
+                    </div>
+                    {activeNation && (
+                        <div className="absolute top-0 right-0 h-full w-[450px] z-30 animate-slide-left flex flex-col shadow-2xl bg-[#dcd0bb] border-l-4 border-[#5c4a3d]" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/aged-paper.png")' }}>
+                            <button onClick={()=>setActiveNation(null)} className="absolute top-4 right-4 p-2 z-50 hover:bg-[#78350f] hover:text-white rounded"><X/></button>
+                            {activeNation.flag && ( <img src={activeNation.flag} className={`absolute top-0 right-0 w-[350px] h-auto object-contain pointer-events-none rotate-12 mix-blend-multiply opacity-25`} /> )}
+                            <div className="p-8 pt-12 border-b-2 border-[#5c4a3d]/30 bg-[#292524]/5 relative z-10">
+                                <div className="flex items-center gap-3"><h2 className="text-4xl font-bold text-[#292524] tracking-widest">{activeNation.name}</h2></div>
+                                <p className="text-sm text-[#78350f] font-bold mt-2">{activeNation.desc}</p>
+                            </div>
+                             <div className="flex-1 overflow-y-auto p-8 custom-scrollbar text-[#44403c] leading-relaxed relative z-10"><div dangerouslySetInnerHTML={{ __html: activeNation.content }} /></div>
+                        </div>
+                    )}
+                    {activeLog && (
+                        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-[700px] animate-slide-up z-40">
+                            <div className="relative z-10 bg-[#f2e6d6] border-t-4 border-[#78350f] shadow-2xl flex overflow-visible" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cream-paper.png")' }}>
+                                <div className="absolute inset-0 overflow-hidden rounded-lg pointer-events-none z-0">
+                                    {getNationFlagForId(activeLog.id) && ( <img src={getNationFlagForId(activeLog.id)} className={`absolute top-1/2 right-10 -translate-y-1/2 h-auto opacity-20 mix-blend-multiply rotate-6 ${activeLog.id.startsWith('o') ? 'w-[250px]' : 'w-[300px]'}`} /> )}
+                                </div>
+                                <button onClick={()=>setActiveLog(null)} className="absolute top-2 right-2 hover:bg-[#78350f] hover:text-white rounded p-1 transition-colors z-50"><X size={18}/></button>
+                                <div className="w-48 relative flex-shrink-0 -mt-12 ml-4 self-end z-20">
+                                     <img src={activeLog.image} className="w-full h-auto max-h-[350px] object-contain object-bottom drop-shadow-xl pointer-events-none" style={{ marginBottom: '-2px' }} />
+                                </div>
+                                <div className="flex-1 p-6 pl-2 flex flex-col gap-4 relative z-10">
+                                    <div className="border-b border-[#78350f]/20 pb-2 flex justify-between items-end">
+                                        <div className="flex items-center gap-2"><h2 className="text-2xl font-bold text-[#292524] tracking-wider">{activeLog.name}</h2></div>
+                                        {chatState === 'bio' && ( <button onClick={handleStartChat} className="flex items-center gap-1 text-xs bg-[#78350f] text-[#fef3c7] px-3 py-1 rounded font-bold hover:bg-[#991b1b] shadow-sm"><MessageSquare size={12}/> {t.chat}</button> )}
+                                        {chatState !== 'bio' && ( <button onClick={()=>setChatState('bio')} className="text-xs text-[#5c4a3d] underline hover:text-[#78350f]">{t.backList}</button> )}
+                                    </div>
+                                    <div className="flex flex-wrap gap-2 text-xs font-mono text-[#5c4a3d]">
+                                        <div className="bg-[#292524]/5 px-2 py-1 rounded border border-[#5c4a3d]/20"><span className="opacity-50 mr-1">{t.labelHeight}:</span>{activeLog.height}</div>
+                                        <div className="bg-[#292524]/5 px-2 py-1 rounded border border-[#5c4a3d]/20"><span className="opacity-50 mr-1">{t.labelAge}:</span>{activeLog.age}</div>
+                                        <div className="bg-[#292524]/5 px-2 py-1 rounded border border-[#5c4a3d]/20"><span className="opacity-50 mr-1">{t.labelGender}:</span>{activeLog.gender}</div>
+                                        <div className="bg-[#292524]/5 px-2 py-1 rounded border border-[#5c4a3d]/20"><span className="opacity-50 mr-1">{t.labelStatus}:</span>{activeLog.relation}</div>
+                                    </div>
+                                    <div className="text-xs text-[#be123c] font-bold"><span className="opacity-70 text-[#292524] mr-2">[{t.labelPersonality}]</span>{activeLog.personality}</div>
+                                    <div className="overflow-y-auto custom-scrollbar max-h-[150px] pr-2 min-h-[120px]">
+                                        {chatState === 'bio' && ( <p className="text-[#292524] text-sm leading-relaxed font-serif italic opacity-90 animate-fade-in-up">"{activeLog.log}"</p> )}
+                                        {chatState === 'intro' && dialogueData && (
+                                            <div className="animate-fade-in-up space-y-4">
+                                                <div className="bg-[#fffbf2]/80 border-l-4 border-[#78350f] p-3 shadow-sm"><p className="text-[#292524] font-bold text-sm italic">"{dialogueData.start}"</p></div>
+                                                <div className="space-y-2">{dialogueData.options.map(opt => ( <button key={opt.id} onClick={() => handleOptionSelect(opt)} className="w-full text-left bg-[#f5f5f4] border border-[#d6d3d1] p-2 text-xs hover:bg-[#78350f] hover:text-[#fffbf2] hover:border-[#78350f] transition-all rounded shadow-sm flex items-center gap-2 group"><span className="opacity-50 group-hover:opacity-100">➤</span> {opt.text}</button> ))}</div>
+                                            </div>
+                                        )}
+                                        {chatState === 'result' && chatOption && (
+                                            <div className="animate-fade-in-up space-y-3">
+                                                <p className="text-[#5c4a3d] text-xs italic border-l-2 border-[#a8a29e] pl-2 mb-2 opacity-70">{t.dialogue.you}: {chatOption.text}</p>
+                                                <div className="bg-[#fffbf2]/90 border border-[#78350f]/20 p-3 rounded shadow-sm"><p className="text-[#78350f] font-bold text-sm leading-relaxed">"{chatOption.reply}"</p></div>
+                                                <button onClick={() => setChatState('bio')} className="text-xs mt-2 text-[#5c4a3d] hover:text-[#78350f] border-b border-transparent hover:border-[#78350f] transition-colors pb-0.5">{t.dialogue.end}</button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    {activeUserChar && (
+                         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-[550px] animate-slide-up">
+                            <div className="relative z-10 bg-[#f2e6d6] border-4 border-[#78350f] rounded-lg p-6 pl-36 shadow-2xl min-h-[140px] flex flex-col justify-center" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cream-paper.png")' }}>
+                                 <img src={activeUserChar.imageUrl} className="absolute bottom-0 left-[-20px] w-40 h-60 z-50 object-contain object-bottom pointer-events-none drop-shadow-2xl" />
+                                <button onClick={()=>setActiveUserChar(null)} className="absolute top-2 right-2"><X size={16}/></button>
+                                <div className="mb-2 border-b border-[#78350f]/20 pb-1 flex items-center gap-2">
+                                    <span className="bg-[#78350f] text-[#fef3c7] px-3 py-0.5 rounded text-xs font-bold">{activeUserChar.name}</span>
+                                    <span className="text-[10px] text-[#5c4a3d] uppercase tracking-widest">{activeUserChar.nationName}</span>
+                                </div>
+                                 <p className="text-[#292524] font-serif leading-relaxed line-clamp-3 text-sm italic">{activeUserChar.backstory || "..."}</p>
+                            </div>
+                        </div>
+                    )}
+                    <div className="absolute top-8 right-8 flex flex-col gap-2 z-20"><button onClick={()=>setScale(s=>s+0.2)} className="p-3 bg-[#292524] text-[#dcd0bb]"><ZoomIn/></button><button onClick={()=>setScale(s=>Math.max(0.5,s-0.2))} className="p-3 bg-[#292524] text-[#dcd0bb]"><ZoomOut/></button></div>
+                    <button onClick={onGoHome} className="absolute bottom-8 right-8 w-20 h-20 rounded-full bg-[#292524] border-4 border-[#dcd0bb] shadow-2xl flex flex-col items-center justify-center text-[#dcd0bb] hover:bg-[#78350f] z-40"><Home size={28}/><span className="text-[10px] font-bold">{t.home}</span></button>
+                </div>
+            );
+        };
+
+        const HomeSanctuaryPhase = ({ onBackMap, userTrait, lang, myCharacters, onOpenCreator, setActiveChar }) => {
+          const [activeModal, setActiveModal] = useState(null);
+          const [detailLog, setDetailLog] = useState(null); 
+          const [hoveredRoute, setHoveredRoute] = useState(null); 
+          
+          const userNationId = TRAIT_KEYS[userTrait] || 'bird';
+          const nations = useMemo(() => getNations(lang), [lang]);
+          const presets = useMemo(() => getAbilityPresets(lang), [lang]);
+          const councilLogs = useMemo(() => getCouncilLogs(lang), [lang]);
+          const t = TEXT[lang].ui;
+
+          const citizenProfile = nations[userNationId];
+          const baseUserStats = presets[userTrait] || presets['express']; 
+          
+          const [userStats, setUserStats] = useState(baseUserStats);
+          useEffect(() => { setUserStats(generateRandomStats(baseUserStats)); }, []); 
+
+          const routes = useMemo(() => generateDenseRoutes(lang), [lang]);
+
+          return (
+            <div className="w-full h-screen relative bg-[#1c1917] overflow-hidden font-serif">
+              <div className="absolute inset-0">
+                <img src={IMG_HOME_BG} className="w-full h-full object-cover" alt="Home" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none"></div>
+               </div>
+
+              {/* OC Display Bar */}
+              <div className="absolute bottom-4 left-4 z-30 flex items-end gap-4 animate-fade-in-up">
+                  {myCharacters.map((char) => (
+                      <div key={char.id} className="group relative cursor-pointer hover:scale-110 transition-transform origin-bottom" onClick={() => setActiveChar(char)}>
+                          <img src={char.imageUrl} className="h-40 w-auto object-contain drop-shadow-2xl border-2 border-transparent bg-transparent rounded-lg"/>
+                          <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-[#292524]/90 text-[#dcd0bb] p-2 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-40 border border-[#5c4a3d]">
+                              <div className="font-bold">{char.name}</div>
+                              <div>{char.nationName}</div>
+                          </div>
+                      </div>
+                  ))}
+              </div>
+
+              <button onClick={onOpenCreator} className="absolute bottom-8 right-8 z-30 bg-[#7f1d1d] text-[#dcd0bb] border-2 border-[#5c4a3d] px-6 py-3 rounded-sm font-bold shadow-xl hover:bg-[#991b1b] hover:scale-105 transition-all flex items-center gap-2 uppercase tracking-widest">
+                 <UserPlus size={20}/> {t.createChar}
+              </button>
+
+              <div className="absolute inset-0 z-10">
+                  <div onClick={() => setActiveModal('newspaper')} className="absolute bottom-[5%] left-[5%] h-[65%] w-auto cursor-pointer group z-20">
+                      <img src={IMG_NPC_BIRD} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
+                  </div>
+                  <div className="absolute bottom-[5%] left-[30%] h-[65%] w-auto group z-20">
+                      <img src={IMG_NPC_HORSE} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
+                  </div>
+                  <div className="absolute bottom-[5%] left-[55%] h-[65%] w-auto group z-20">
+                      <img src={IMG_NPC_SOL} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
+                  </div>
+                  <div className="absolute bottom-[5%] right-[5%] h-[65%] w-auto group z-20">
+                      <img src={IMG_NPC_FISH} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
+                  </div>
+              </div>
+
+              <div className="absolute top-10 left-1/2 -translate-x-1/2 flex gap-4 z-20">
+                {[ { id: 'module1', label: t.module1, icon: Eye }, { id: 'module2', label: t.module2, icon: Activity }, { id: 'module3', label: t.module3, icon: Heart } ].map(mod => (
+                  <button key={mod.id} onClick={() => setActiveModal(mod.id)} className="bg-[#fffbf2]/90 backdrop-blur border border-[#d4c5a9] px-6 py-3 rounded-sm shadow-lg flex items-center gap-2 text-[#4a3b32] hover:bg-[#78350f] hover:text-[#fffbf2] transition-colors">
+                     <mod.icon size={16} /> <span className="text-sm tracking-widest font-bold uppercase">{mod.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              <button onClick={onBackMap} className="absolute top-10 left-10 z-20 text-[#fffbf2] hover:text-[#fecaca] flex items-center gap-2 drop-shadow-md">
+                 <MapIcon size={20} /> <span className="tracking-widest text-sm uppercase">{t.backMap}</span>
+              </button>
+
+              {activeModal && activeModal !== 'newspaper' && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => { setActiveModal(null); setDetailLog(null); }}>
+                   <div className="relative w-[750px] max-w-[90vw] h-[600px] max-h-[85vh] bg-[#f0e6d2] shadow-[0_0_50px_rgba(0,0,0,1)] p-12 flex flex-col items-center animate-fade-in-up border-4 border-[#5c4a3d] overflow-hidden" onClick={e => e.stopPropagation()} style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/old-mathematics.png")', backgroundBlendMode: 'multiply' }}>
+                      <button onClick={() => { setActiveModal(null); setDetailLog(null); }} className="absolute top-4 right-4 text-[#4a3b32] hover:scale-110 z-50"><X/></button>
+                      <div className="w-full h-1 bg-[#4a3b32] mb-1"></div><div className="w-full h-0.5 bg-[#4a3b32] mb-6"></div>
+                      {activeModal === 'module1' && (
+                        <div className="w-full h-full overflow-y-auto custom-scrollbar pr-2 relative">
+                           <div className="flex items-center justify-center gap-3 mb-6"><Eye size={32} className="text-[#78350f]" /><h2 className="text-2xl font-black text-[#292524] tracking-tighter">{t.perceptionTitle}</h2></div>
+                          <div className="bg-[#292524]/10 p-6 rounded border border-[#5c4a3d] mb-6 relative overflow-hidden">
+                            {citizenProfile.flag && ( <img src={citizenProfile.flag} className="absolute right-[-20px] bottom-[-20px] w-48 h-auto opacity-60 rotate-12 pointer-events-none mix-blend-multiply" /> )}
+                            <div className="absolute top-0 right-0 bg-[#78350f] text-[#dcd0bb] px-3 py-1 text-xs font-bold">{t.identityVerified}</div>
+                            <div className="flex items-center gap-4 mb-2 relative z-10"><h3 className="text-xl font-bold text-[#78350f]">{citizenProfile.name}</h3></div>
+                            <p className="text-sm text-[#57534e] mb-2 relative z-10">{t.duty}: {citizenProfile.desc}</p>
+                          </div>
+                          <div className="space-y-4 mb-8 relative z-10">
+                              {[{ k: 'emotion' }, { k: 'rhythm' }, { k: 'relation' }, { k: 'space' }, { k: 'scent' }, { k: 'conflict' }].map(attr => (
+                              <div key={attr.k} className="flex items-center gap-4">
+                                 <span className="w-32 text-xs font-bold text-[#4a3b32] text-right">{t.abilityLabels[attr.k]}</span>
+                                <div className="flex-1 h-3 bg-[#dcd0bb] rounded-full border border-[#a8a29e] relative overflow-hidden"><div className="h-full bg-[#78350f] transition-all duration-1000 ease-out" style={{ width: `${userStats.scores[attr.k]}%` }}></div></div>
+                                <span className="w-8 text-xs font-mono text-[#78350f]">{userStats.scores[attr.k]}</span>
+                               </div>
+                            ))}
+                          </div>
+                           <div className="bg-[#fffbf2] border-l-4 border-[#be123c] p-4 text-sm text-[#57534e] relative z-10">
+                            <h4 className="font-bold text-[#be123c] mb-1 flex items-center gap-2"><Activity size={14}/> {t.systemAdvice}</h4>
+                            <p>{t.matchText.replace('{match}', userStats.match)}</p><p className="mt-2 text-xs opacity-80">{t.altMatchText.replace('{title}', userStats.title).replace('{altMatch}', userStats.altMatch)}</p>
+                           </div>
+                        </div>
+                      )}
+
+                      {activeModal === 'module2' && (
+                         <div className="w-full h-full flex flex-col">
+                          <div className="flex items-center justify-center gap-3 mb-4 flex-shrink-0"><Activity size={32} className="text-[#78350f]" /><h2 className="text-2xl font-black text-[#292524] tracking-tighter">{t.councilTitle}</h2></div>
+                          <div className="flex-1 overflow-hidden relative w-full flex flex-col">
+                             {!detailLog ? (
+                              <div className="h-full overflow-y-auto custom-scrollbar space-y-3 pr-2 pl-2">
+                                {councilLogs.map((log) => (
+                                   <div key={log.id} onClick={() => setDetailLog(log)} className="border border-[#5c4a3d]/30 bg-[#fffbf2]/50 p-4 rounded hover:bg-[#fffbf2] transition-all cursor-pointer flex justify-between items-center group">
+                                    <div><div className="text-xs text-[#78350f] font-mono mb-1">{log.date}</div><h4 className="font-bold text-[#292524] text-sm group-hover:text-[#be123c]">{log.topic}</h4></div>
+                                     <span className="text-xs bg-[#292524]/10 px-2 py-1 rounded text-[#57534e] flex-shrink-0 ml-2">{log.status}</span>
+                                  </div>
+                                ))}
+                               </div>
+                            ) : (
+                              <div className="h-full overflow-y-auto custom-scrollbar w-full px-4 md:px-12 py-4">
+                                 <button onClick={() => setDetailLog(null)} className="mb-6 text-xs flex items-center gap-2 text-[#78350f] font-bold hover:underline bg-[#fffbf2]/50 px-3 py-1 rounded w-fit">{t.backList}</button>
+                                <div className="max-w-2xl mx-auto text-left">
+                                  <h3 className="text-2xl font-bold text-[#292524] mb-2 leading-tight">{detailLog.topic}</h3>
+                                   <div className="flex items-center gap-4 text-xs text-[#57534e] border-b-2 border-[#5c4a3d]/20 pb-4 mb-6 font-mono"><span className="font-bold">{detailLog.date}</span><span className="px-2 py-0.5 bg-[#292524] text-[#dcd0bb] rounded">{detailLog.status}</span></div>
+                                  <div className="text-base text-[#44403c] leading-loose whitespace-pre-line font-serif bg-[#fffbf2]/30 p-4 rounded-lg border border-[#5c4a3d]/10">{detailLog.details}</div>
+                                 </div>
+                              </div>
+                            )}
+                           </div>
+                        </div>
+                      )}
+
+                      {activeModal === 'module3' && (
+                        <div className="w-full h-full flex flex-col">
+                            <div className="flex items-center justify-center gap-3 mb-4"><Heart size={32} className="text-[#78350f]" /><h2 className="text-2xl font-black text-[#292524] tracking-tighter">{t.networkTitle}</h2></div>
+                            <div className="relative w-full flex-1 bg-[#292524] rounded border border-[#5c4a3d] overflow-hidden flex items-center justify-center">
+                             <img src={IMG_MAP_BG} className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale" />
+                            <svg className="absolute inset-0 w-full h-full z-10" viewBox="0 0 400 350">
+                               {routes.map((r) => (
+                                     <g key={r.id} onMouseEnter={() => setHoveredRoute(r)} onMouseLeave={() => setHoveredRoute(null)}>
+                                  <path d={`M${r.start.x},${r.start.y} Q${r.cpX},${r.cpY} ${r.end.x},${r.end.y}`} fill="none" stroke="transparent" strokeWidth={15} className="cursor-pointer" />
+                                   <path d={`M${r.start.x},${r.start.y} Q${r.cpX},${r.cpY} ${r.end.x},${r.end.y}`} fill="none" stroke={hoveredRoute === r ? "#dcd0bb" : "#78350f"} strokeWidth={hoveredRoute === r ? 3 : 1.5} strokeOpacity={hoveredRoute === r ? 1 : r.opacity} className="transition-all duration-300 pointer-events-none" />
+                                </g>
+                              ))}
+                              <circle cx="200" cy="175" r="8" fill="#be123c" /> {/* Bird */}
+                              <circle cx="300" cy="133" r="8" fill="#854d0e" /> {/* Hyena */}
+                              <circle cx="132" cy="122.5" r="8" fill="#1e3a8a" /> {/* Orca */}
+                            </svg>
+                            {hoveredRoute && (
+                               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#292524]/95 text-[#dcd0bb] px-4 py-3 rounded border border-[#78350f] text-sm shadow-xl animate-fade-in-up max-w-[300px] text-center z-50">
+                                <div className="font-bold text-[#fecaca] mb-1">{t.routeInfo} #{hoveredRoute.id + 2050}</div>{hoveredRoute.desc}
+                             </div>
+                             )}
+                          </div>
+                          <div className="mt-4 text-center text-xs text-[#57534e]">{t.networkStats.replace('{count}', routes.length)}</div>
+                      </div>
+                       )}
+                      <div className="w-full h-0.5 bg-[#4a3b32] mt-auto mb-1"></div><div className="w-full h-1 bg-[#4a3b32]"></div>
+                   </div>
+                </div>
+              )}
+
+               {activeModal === 'newspaper' && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setActiveModal(null)}>
+                   <div className="relative max-w-4xl w-full max-h-[90vh] bg-[#e5e5e5] shadow-2xl animate-unfold overflow-hidden" onClick={e => e.stopPropagation()}>
+                      <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 z-50 bg-black text-white p-2 rounded-full"><X/></button>
+                      <div className="w-full h-full overflow-y-auto custom-scrollbar"><img src={IMG_NEWSPAPER} className="w-full h-auto block" /></div>
+                   </div>
+                </div>
+              )}
+            </div>
+           );
+        }
+
+        function App() {
+          const [phase, setPhase] = useState('invitation');
+          const [userTrait, setUserTrait] = useState(''); 
+          const [lang, setLang] = useState('zh'); 
+          const [myCharacters, setMyCharacters] = useState([]); 
+          const [activeCharId, setActiveCharId] = useState(null);
+          const [showCreator, setShowCreator] = useState(false); 
+          
+          // Replaced localStorage loading with Firebase Listener
+          useEffect(() => {
+              const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+                  if (user) {
+                      const unsubscribe = db.collection('characters')
+                          .where('userId', '==', user.uid)
+                          .onSnapshot((snapshot) => {
+                              const chars = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                              setMyCharacters(chars);
+                              if (chars.length > 0 && !activeCharId) setActiveCharId(chars[0].id);
+                          }, (error) => {
+                              console.error("Error fetching characters:", error);
+                          });
+                      return () => unsubscribe();
+                  } else {
+                      setMyCharacters([]);
+                  }
+              });
+              return () => unsubscribeAuth();
+          }, []);
+
+          const handleEnterWorld = (trait) => { setUserTrait(trait); setPhase('map'); };
+          const handleCharFinish = (newChar) => { 
+              // State update happens via onSnapshot automatically, but we can set active ID here
+              setActiveCharId(newChar.id); 
+              setShowCreator(false); 
+          };
+          const activeCharacter = myCharacters.find(c => c.id === activeCharId);
+          
+          return (
+            <div className="w-full h-screen font-serif selection:bg-[#78350f] selection:text-[#fffbf2]">
+              <button onClick={() => setLang(prev => prev === 'zh' ? 'en' : 'zh')} className="fixed top-6 right-8 z-[100] px-4 py-2 bg-[#292524] text-[#dcd0bb] border border-[#78350f] font-serif text-xs font-bold tracking-widest hover:bg-[#78350f] hover:text-white transition-colors shadow-lg flex items-center gap-2"><Globe size={14} /> {lang === 'zh' ? 'EN' : '中'}</button>
+              {phase === 'invitation' && <InvitationPhase onEnter={handleEnterWorld} lang={lang} />}
+              {phase === 'map' && <WorldMapPhase onGoHome={() => setPhase('home')} lang={lang} userChars={myCharacters} />}
+              {phase === 'home' && <HomeSanctuaryPhase onBackMap={() => setPhase('map')} userTrait={userTrait} lang={lang} activeChar={activeCharacter} onOpenCreator={() => setShowCreator(true)} myCharacters={myCharacters} setActiveChar={(char) => setActiveCharId(char.id)} />}
+              {showCreator && <CharacterCreator lang={lang} onClose={() => setShowCreator(false)} onFinish={handleCharFinish} />}
+             </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
