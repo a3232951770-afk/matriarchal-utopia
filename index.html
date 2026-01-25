@@ -22,8 +22,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <!-- Storage SDK removed as we are using Firestore for images now -->
-    <!-- <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script> -->
 
     <!-- CSS Reset & Styles -->
     <style>
@@ -85,8 +83,6 @@
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
-        // Storage is no longer needed since we are saving Base64 to Firestore
-        // const storage = firebase.storage(); 
         const auth = firebase.auth();
 
         // Ensure anonymous auth for database access
@@ -194,7 +190,6 @@
 
         const NPC_DIALOGUES = {
             zh: {
-                // Ⅰ｜羽择国 (Bird)
                 'b1': { 
                     start: "看看这满地的羽毛。每一根都是他们在台上的誓言。男孩们负责闪耀，而我负责把这些闪耀编织成能踩在脚下的地板。",
                     options: [
@@ -219,7 +214,6 @@
                         { id: 3, text: "你自己呢？", reply: "我？我是那个在后台把灯光调暗的人。让赢家不至于太骄傲，输家不至于太难堪。这也是一种‘照护’，对吧？" }
                     ]
                 },
-                // Ⅱ｜裂识国 (Hyena)
                 'h1': { 
                     start: "你站的位置是死角。如果现在有袭击，你会是防线上第一个裂口。往左移三步。我们不靠拥抱来保护彼此，我们靠站位。",
                     options: [
@@ -244,7 +238,6 @@
                         { id: 3, text: "想过离开吗？", reply: "去哪？去那些充满谎言的地方吗？这里虽然冷硬，但这里是真实的。只要我有用，我就有尊严。这很公平。" }
                     ]
                 },
-                // Ⅲ｜忆行国 (Orca)
                 'o1': { 
                     start: "年轻人都想忘掉痛苦，觉得那是负担。但我留着这道疤，是因为它记录了五十年前的那场海啸。忘掉它，我的孩子们就会在同一片海域被淹死。",
                     options: [
@@ -271,7 +264,6 @@
                 }
             },
             en: {
-                // Ⅰ｜Plumaria (Bird)
                 'b1': {
                     start: "Look at the feathers on the ground. Each one is a vow they made on stage. The boys are responsible for shining, and I am responsible for weaving that shine into a floor we can walk on.",
                     options: [
@@ -296,7 +288,6 @@
                         { id: 3, text: "What about you?", reply: "Me? I'm the one dimming the lights backstage. So the winners aren't too proud, and the losers aren't too embarrassed. That's a form of 'care', isn't it?" }
                     ]
                 },
-                // Ⅱ｜Riftmark (Hyena)
                 'h1': {
                     start: "You're standing in a blind spot. If there's an attack, you'll be the first breach. Move three steps left. We don't protect each other with hugs; we protect with positioning.",
                     options: [
@@ -321,7 +312,6 @@
                         { id: 3, text: "Ever thought of leaving?", reply: "To where? Places full of lies? It's cold and hard here, but it's real. As long as I am useful, I have dignity. That is fair." }
                     ]
                 },
-                // Ⅲ｜Mnemos (Orca)
                 'o1': {
                     start: "Young ones want to forget pain, thinking it a burden. But I keep this scar because it records the tsunami fifty years ago. Forget it, and my children will drown in the same waters.",
                     options: [
@@ -1337,14 +1327,10 @@
 
                     const charId = Date.now().toString();
                     
-                    // 1. UPDATED: Save Image Directly to Firestore (No Storage Bucket needed)
-                    // We use finalImage directly which is a Base64 string
-                    
-                    // 2. Save Data to Firestore
                     const newChar = {
                         id: charId,
                         ...formData,
-                        imageUrl: finalImage, // Storing the Base64 string directly
+                        imageUrl: finalImage,
                         nationName: nationBase.name,
                         createdAt: new Date().toISOString(),
                         userId: user.uid,
@@ -1602,6 +1588,7 @@
             const dialogueData = activeLog ? (NPC_DIALOGUES[lang][activeLog.id] || NPC_DIALOGUES['zh'][activeLog.id]) : null;
             
             const getNationFlagForId = (id) => {
+                if (!id) return null;
                 if (id.startsWith('b')) return nations.bird.flag;
                 if (id.startsWith('h')) return nations.hyena.flag;
                 if (id.startsWith('o')) return nations.orca.flag;
@@ -1701,7 +1688,9 @@
                                     <span className="bg-[#78350f] text-[#fef3c7] px-3 py-0.5 rounded text-xs font-bold">{activeUserChar.name}</span>
                                     <span className="text-[10px] text-[#5c4a3d] uppercase tracking-widest">{activeUserChar.nationName}</span>
                                 </div>
-                                 <p className="text-[#292524] font-serif leading-relaxed line-clamp-3 text-sm italic">{activeUserChar.backstory || "..."}</p>
+                                 <div className="max-h-[150px] overflow-y-auto custom-scrollbar pr-2">
+                                    <p className="text-[#292524] font-serif leading-relaxed text-sm italic">{activeUserChar.backstory || "..."}</p>
+                                 </div>
                             </div>
                         </div>
                     )}
@@ -1888,7 +1877,6 @@
           const [activeCharId, setActiveCharId] = useState(null);
           const [showCreator, setShowCreator] = useState(false); 
           
-          // Replaced localStorage loading with Firebase Listener
           useEffect(() => {
               const unsubscribeAuth = auth.onAuthStateChanged((user) => {
                   if (user) {
@@ -1911,7 +1899,6 @@
 
           const handleEnterWorld = (trait) => { setUserTrait(trait); setPhase('map'); };
           const handleCharFinish = (newChar) => { 
-              // State update happens via onSnapshot automatically, but we can set active ID here
               setActiveCharId(newChar.id); 
               setShowCreator(false); 
           };
