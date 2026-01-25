@@ -567,7 +567,7 @@
               viewPaper: "View Today's Gazette", 
               askEnter: "In what guise shall you enter this world?", 
               identityQ: "Select your identity orientation:", 
-              traitQ: "To which life philosophy do you drift?", 
+              traitQ: "Which path is your idealized life direction?", 
               male: "Male", 
               female: "Female", 
               nonBinary: "Non-binary / Queer", 
@@ -847,7 +847,7 @@
               viewPaper: "查看今日报纸",
               askEnter: "你希望以哪种身份进入这个世界？",
               identityQ: "你希望以哪种身份进入这个世界？",
-              traitQ: "你目前更接近哪种生活方向？",
+              traitQ: "你理想化的生活方向是哪条路径？",
               male: "男性",
               female: "女性",
               nonBinary: "非二元 / 性别酷儿",
@@ -1873,42 +1873,54 @@
           const [phase, setPhase] = useState('invitation');
           const [userTrait, setUserTrait] = useState(''); 
           const [lang, setLang] = useState('zh'); 
-          const [myCharacters, setMyCharacters] = useState([]); 
+          const [allCharacters, setAllCharacters] = useState([]); 
+          const [currentUser, setCurrentUser] = useState(null);
           const [activeCharId, setActiveCharId] = useState(null);
           const [showCreator, setShowCreator] = useState(false); 
           
           useEffect(() => {
               const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+                  setCurrentUser(user);
                   if (user) {
                       const unsubscribe = db.collection('characters')
-                          .where('userId', '==', user.uid)
                           .onSnapshot((snapshot) => {
                               const chars = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                              setMyCharacters(chars);
-                              if (chars.length > 0 && !activeCharId) setActiveCharId(chars[0].id);
+                              setAllCharacters(chars);
+                              
+                              const myChars = chars.filter(c => c.userId === user.uid);
+                              if (myChars.length > 0 && !activeCharId) {
+                                  setActiveCharId(myChars[0].id);
+                              }
                           }, (error) => {
                               console.error("Error fetching characters:", error);
                           });
                       return () => unsubscribe();
                   } else {
-                      setMyCharacters([]);
+                      setAllCharacters([]);
+                      setCurrentUser(null);
                   }
               });
               return () => unsubscribeAuth();
-          }, []);
+          }, []); // Effect runs once on mount, logic handles updates
 
           const handleEnterWorld = (trait) => { setUserTrait(trait); setPhase('map'); };
           const handleCharFinish = (newChar) => { 
               setActiveCharId(newChar.id); 
               setShowCreator(false); 
           };
-          const activeCharacter = myCharacters.find(c => c.id === activeCharId);
+
+          const myCharacters = useMemo(() => {
+              if (!currentUser) return [];
+              return allCharacters.filter(c => c.userId === currentUser.uid);
+          }, [allCharacters, currentUser]);
+
+          const activeCharacter = myCharacters.find(c => c.id === activeCharId) || (myCharacters.length > 0 ? myCharacters[0] : null);
           
           return (
             <div className="w-full h-screen font-serif selection:bg-[#78350f] selection:text-[#fffbf2]">
               <button onClick={() => setLang(prev => prev === 'zh' ? 'en' : 'zh')} className="fixed top-6 right-8 z-[100] px-4 py-2 bg-[#292524] text-[#dcd0bb] border border-[#78350f] font-serif text-xs font-bold tracking-widest hover:bg-[#78350f] hover:text-white transition-colors shadow-lg flex items-center gap-2"><Globe size={14} /> {lang === 'zh' ? 'EN' : '中'}</button>
               {phase === 'invitation' && <InvitationPhase onEnter={handleEnterWorld} lang={lang} />}
-              {phase === 'map' && <WorldMapPhase onGoHome={() => setPhase('home')} lang={lang} userChars={myCharacters} />}
+              {phase === 'map' && <WorldMapPhase onGoHome={() => setPhase('home')} lang={lang} userChars={allCharacters} />}
               {phase === 'home' && <HomeSanctuaryPhase onBackMap={() => setPhase('map')} userTrait={userTrait} lang={lang} activeChar={activeCharacter} onOpenCreator={() => setShowCreator(true)} myCharacters={myCharacters} setActiveChar={(char) => setActiveCharId(char.id)} />}
               {showCreator && <CharacterCreator lang={lang} onClose={() => setShowCreator(false)} onFinish={handleCharFinish} />}
              </div>
