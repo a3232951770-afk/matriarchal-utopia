@@ -1943,7 +1943,7 @@
           
           return (
             <div className="w-full h-screen font-serif selection:bg-[#78350f] selection:text-[#fffbf2]">
-              <button onClick={() => setLang(prev => prev === 'zh' ? 'en' : 'zh')} className="fixed top-24 right-8 z-[100] px-4 py-2 bg-[#292524] text-[#dcd0bb] border border-[#78350f] font-serif text-xs font-bold tracking-widest hover:bg-[#78350f] hover:text-white transition-colors shadow-lg flex items-center gap-2"><Globe size={14} /> {lang === 'zh' ? 'EN' : '中'}</button>
+              <button onClick={() => setLang(prev => prev === 'zh' ? 'en' : 'zh')} className="fixed bottom-8 left-8 z-[100] px-4 py-2 bg-[#292524] text-[#dcd0bb] border border-[#78350f] font-serif text-xs font-bold tracking-widest hover:bg-[#78350f] hover:text-white transition-colors shadow-lg flex items-center gap-2"><Globe size={14} /> {lang === 'zh' ? 'EN' : '中'}</button>
               {phase === 'invitation' && <InvitationPhase onEnter={handleEnterWorld} lang={lang} />}
               {phase === 'map' && <WorldMapPhase onGoHome={() => setPhase('home')} lang={lang} userChars={allCharacters} />}
               {phase === 'home' && <HomeSanctuaryPhase onBackMap={() => setPhase('map')} userTrait={userTrait} lang={lang} activeChar={activeCharacter} onOpenCreator={() => setShowCreator(true)} myCharacters={myCharacters} setActiveChar={(char) => setActiveCharId(char.id)} />}
