@@ -133,7 +133,8 @@
         const IMG_NPC_FISH = "https://i.postimg.cc/j5M8JnZm/图层_1.png"; 
         const IMG_NPC_SOL = "https://i.postimg.cc/nz3dQ906/图层_4.png"; 
         
-        const IMG_NEWSPAPER = "https://i.postimg.cc/NG64NwMn/oc-1.jpg";
+        const IMG_NEWSPAPER_BIRD = "https://i.postimg.cc/NfV8f4M9/鸟国报纸.jpg";
+        const IMG_NEWSPAPER_FISH = "https://i.postimg.cc/8P3dPH5F/鱼国报纸.jpg";
 
         // Flags
         const FLAG_BIRD = "https://i.postimg.cc/XJKtSBYm/羽择国旗帜_yi.png";
@@ -824,12 +825,12 @@
               express: { title: 'Aesthetic Architect', match: 'Plumaria', altMatch: 'Mnemos' },
             },
             council: [
-              { id: 1, topic: 'Review of Nesting Qualifications for Candidate A-702', status: 'Archived', details: `Time: 2056/06/08 14:00\nAttendees: Matriarch, Observer, Nest Inspector\n\n[14:05] Matriarch: "Can this candidate bear the weight of the core nest?"\n[14:25] Inspector: "Structure shifted 2mm in storm simulation. Slight risk."\n[14:40] Ruling: Denied core access. Reassigned to perimeter defense.` },
-              { id: 2, topic: 'Anomaly Assessment of Worker Sequence B-9', status: 'Processing', details: `Time: 2056/06/12 09:00\n\n[09:06] System: "Hesitation of 0.3s detected during feeding. 'Private emotion' impurity found."\n[09:20] Ruling: 0.5% risk to stability. Transfer to resource transport immediately.` },
-              { id: 3, topic: 'Entry Qualification for Outsider H-3', status: 'Monitoring', details: `Time: 2056/06/15 Sunset\n\n[18:05] Guard: "He lingered for three days. Brought fresh prey. No aggression."\n[18:20] Ruling: Allowed in perimeter. Status below youngest cub.` },
-              { id: 4, topic: 'Proposal for "Scent Memory" Curriculum', status: 'New', details: `Time: 2056/06/20\nProposer: Mnemonic Elder\n\n[09:00] Elder: "The young rely too much on sight. They must learn the scent map of the currents."` },
-              { id: 5, topic: 'Cross-Species Care: Abandoned Dolphin Calf', status: 'Urgent', details: `Time: 2056/06/21\n\nReport: Lost calf found.\nAction: Mnemos accepts care. Riftmark provides escort.` },
-              { id: 6, topic: 'Protest Regarding Pigment Allocation', status: 'Denied', details: `Time: 2056/06/22\n\nIssue: Young males protest lack of blue pigment.\nRuling: Pigment reserved for camouflage defense. Use natural feathers.` }
+              { id: 1, topic: 'Review of Nesting Qualifications for Candidate A-702', status: 'Archived', details: `Time: 2056/06/08 14:00\nAttendees: Plumaria Matriarch, Observer\n\n[14:05] Matriarch: "His nest foundation shifted 2mm in the storm simulation."\n[14:10] Observer: "But his intent is pure. He gathered the strongest vines."\n[14:40] Ruling: Core access denied for safety, but he is assigned to the 'Mentorship Program' to learn foundation building. We do not discard potential; we nurture it until it is safe.` },
+              { id: 2, topic: 'Riftmark Outpost: Incident Regarding "Soft Objects"', status: 'Resolved', details: `Time: 2056/06/12 09:00\nLocation: Riftmark Barracks\n\n[09:00] Report: A young warrior was found secretly sewing a crude doll in the barracks. Such items are typically deemed 'distractions'.\n[09:15] Commander He Ya: "Is the doll impeding his weapon handling?"\n[09:16] Lieutenant: "No, Commander. He holds it only during sleep cycles to stabilize REM rhythms."\n[09:20] Verdict: The doll is designated as a 'Psychological Resilience Anchor'. The Commander administered a tactical embrace to the warrior. We are iron, but iron cracks without care. Love is also armor.` },
+              { id: 3, topic: 'Entry Qualification for Wandering Outsider', status: 'Approved', details: `Time: 2056/06/15 Sunset\n\n[18:05] Guard: "He has lingered at the border. He brings no weapons, only stories."\n[18:20] Ruling: Allow him entry into the guest circle. We shall listen. If his stories hold truth, he stays. If he needs rest, he rests. Generosity is the privilege of the strong.` },
+              { id: 4, topic: 'Proposal for "Scent Memory" Curriculum', status: 'New', details: `Time: 2056/06/20\nProposer: Mnemos Elder\n\n[09:00] Elder: "The young rely too much on sight. They must learn the scent map of the currents. To remember is to survive."` },
+              { id: 5, topic: 'Cross-Species Care: Abandoned Dolphin Calf', status: 'Urgent', details: `Time: 2056/06/21\n\nReport: Lost calf found.\nAction: Mnemos accepts care. Riftmark provides escort. We leave no child behind, regardless of species.` },
+              { id: 6, topic: 'Protest Regarding Pigment Allocation in Plumaria', status: 'Addressed', details: `Time: 2056/06/22\n\nIssue: Young males protest lack of blue pigment.\nRuling: Pigment is reserved for defense, but they are encouraged to weave natural flowers into their displays. True beauty comes from adaptation, not resource consumption.` }
             ],
             routes: [
               'Transporting High-Energy Nutrient Fluid', 'Exchanging Parenting Data', 'Requesting Defensive Support', 'Delivering Calming Spices',
@@ -1098,12 +1099,12 @@
               express: { title: '美学构建者', match: '羽择国', altMatch: '忆行国 (情感传颂者)' },
             },
             council: [
-              { id: 1, topic: '关于候选雄性 A-702 的筑巢资格审查', status: '已归档', details: `会议时间：2056年6月8日 下午 14:00\n参会人员：首领、资深观察员、巢穴检验官\n\n[14:05] 首领提问：“这个候选雄性能否承担核心区域的筑巢责任？他的羽色是否显示出足够的健康储备？”\n[14:10] 观察员汇报：“经评估，其装饰物收集能力在前 10%，蓝色羽毛光泽度达标。”\n[14:25] 检验官补充：“但他搭建的基座在模拟风暴测试中出现了 2mm 的位移。虽然微小，但对幼雏安全构成潜在风险。”\n[14:40] 讨论结果：鉴于责任风险，不建议赋予其核心区筑巢权。\n[14:45] 最终建议：降级至外围协作者，负责外围防御性装饰搭建。` },
-              { id: 2, topic: '工蜂序列 B-9 情绪波动异常评估', status: '处理中', details: `会议时间：2056年6月12日 上午 09:00\n参会人员：蜂后代理、系统算法、照护长\n\n[09:05] 蜂后代理：“这个成员适合参与幼体照护吗？他的信息素波动是否平稳？昨日数据有异常。”\n[09:06] 系统：“检测到 B-9 在昨日喂食时出现了 0.3 秒的犹豫，信息素中检出‘私人情感’杂质。”\n[09:15] 照护长：“这种犹豫可能导致喂食效率下降，甚至影响幼体对‘集体’的纯粹认知。”\n[09:20] 讨论结果：判定对系统稳定造成 0.5% 风险。\n[09:22] 最终建议：驳回照护申请，即刻调往资源运输线，切断其与幼体接触。` },
-              { id: 3, topic: '外来雄性 H-3 的入群资格判定', status: '监控中', details: `会议时间：2056年6月15日 日落时分\n参会人员：主母、狩猎先锋、边界守卫\n\n[18:00] 主母：“该雄性是否被核心母系链条允许进入？谁为他的忠诚担保？”\n[18:05] 守卫：“他在边界徘徊了三日，没有攻击幼崽的迹象，且带来了新鲜的猎物。”\n[18:10] 先锋：“猎物质量尚可，但体格不够强壮。建议测试其耐力。”\n[18:20] 讨论结果：允许其在最外围停留，但地位低于最小的幼崽。\n[18:25] 最终建议：观察其在下一次风暴中的表现，若逃跑则驱逐。` },
-              { id: 4, topic: '关于增加“气味记忆”课程的提案', status: '新议案', details: `会议时间：2056年6月20日\n提案人：忆行国长老代表\n\n[09:00] 长老：“现在的幼崽过度依赖视觉，正在丧失对洋流气味的辨识力。建议在幼教阶段强制加入气味图谱训练。”\n[09:15] 育序国代表：“这会占用目前的结构工程学课时，需要重新评估优先级。”` },
-              { id: 5, topic: '跨物种抚育：被遗弃海豚幼崽的归属', status: '紧急', details: `会议时间：2056年6月21日\n\n[10:00] 报告：一只迷途海豚幼崽被发现于羽择国海岸。\n[10:10] 讨论：羽择国缺乏水下抚育设施。忆行国同意接收，并由裂识国护卫队负责沿途护送。` },
-              { id: 6, topic: '关于装饰物分配不均的抗议', status: '驳回', details: `会议时间：2056年6月22日\n\n[14:00] 部分年轻雄性抗议蓝色颜料分配不足，影响求偶展示。\n[14:30] 裁决：颜料优先供应给承担防御任务的伪装者。求偶装饰建议使用天然脱落的羽毛替代。` }
+              { id: 1, topic: '关于候选雄性 A-702 的筑巢资格审查', status: '已归档', details: `会议时间：2056年6月8日 下午 14:00\n参会人员：羽择国首领、资深观察员\n\n[14:05] 首领提问：“这个候选雄性能否承担核心区域的筑巢责任？他的羽色是否显示出足够的健康储备？”\n[14:10] 观察员汇报：“但他搭建的基座在模拟风暴测试中出现了 2mm 的位移。虽然微小，但对幼雏安全构成潜在风险。”\n[14:40] 讨论结果：鉴于安全第一，暂不赋予其核心区筑巢权。但他将被编入“辅助修补队”进行学习。我们不抛弃有潜力的个体，但必须确保他们在准备好之前不会承担过重的责任。` },
+              { id: 2, topic: '裂识国前线：关于战士私藏“柔软织物”的违规通报', status: '已处理', details: `会议时间：2056年6月12日 上午 09:00\n地点：裂识国战备营房\n\n[09:05] 报告：巡逻队在一名年轻战士的枕头下发现了一只手工缝制的粗糙布偶。按律，这是可能影响意志的“软弱之物”。\n[09:15] 赫娅指挥官：“这东西影响他挥剑的速度了吗？”\n[09:16] 副官：“没有，长官。他只在睡眠时握着它，据监测，这显著降低了他的噩梦频率。”\n[09:20] 裁决：该布偶被重新定义为“心理韧性锚点”，允许保留。指挥官在随后给予了该战士一个拥抱。在此重申：我们是钢铁，但钢铁若无维护也会断裂。爱，是另一种形式的铠甲。` },
+              { id: 3, topic: '外来流浪者的入群资格判定', status: '监控中', details: `会议时间：2056年6月15日 日落时分\n参会人员：主母、边界守卫\n\n[18:00] 守卫：“那个外来者在边界徘徊。他没有武器，只有满身的故事。”\n[18:10] 主母：“让他进来，给他在火堆旁留个位置。我们听听他的故事。如果真实，他便留下；如果他只是累了，就让他休息。强者的特权是慷慨，而不是排斥。”` },
+              { id: 4, topic: '关于增加“气味记忆”课程的提案', status: '新议案', details: `会议时间：2056年6月20日\n提案人：忆行国长老代表\n\n[09:00] 长老：“现在的幼崽过度依赖视觉，正在丧失对洋流气味的辨识力。记忆是生存的根本，建议在幼教阶段强制加入气味图谱训练。”` },
+              { id: 5, topic: '跨物种抚育：被遗弃海豚幼崽的归属', status: '紧急', details: `会议时间：2056年6月21日\n\n[10:00] 报告：一只迷途海豚幼崽被发现于羽择国海岸。\n[10:10] 讨论：羽择国缺乏水下抚育设施。忆行国同意接收，并由裂识国护卫队负责沿途护送。无论物种，我们不遗弃任何孩子。` },
+              { id: 6, topic: '关于羽择国颜料分配的抗议', status: '已回应', details: `会议时间：2056年6月22日\n\n[14:00] 部分年轻雄性抗议蓝色颜料分配不足，影响求偶展示。\n[14:30] 裁决：颜料优先供应给承担防御任务的伪装者。但鼓励大家使用自然脱落的花瓣和羽毛进行装饰。真正的美来自于对自然的适应，而非对资源的消耗。` }
             ],
             routes: [
               '输送高能营养液', '交换抚育经验数据', '请求防御力量支援', '运送情绪安抚香料',
@@ -1747,7 +1748,7 @@
               </button>
 
               <div className="absolute inset-0 z-10">
-                  <div onClick={() => setActiveModal('newspaper')} className="absolute bottom-[5%] left-[5%] h-[65%] w-auto cursor-pointer group z-20">
+                  <div onClick={() => setActiveModal('newspaper_bird')} className="absolute bottom-[5%] left-[5%] h-[65%] w-auto cursor-pointer group z-20">
                       <img src={IMG_NPC_BIRD} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
                   </div>
                   <div className="absolute bottom-[5%] left-[30%] h-[65%] w-auto group z-20">
@@ -1756,7 +1757,7 @@
                   <div className="absolute bottom-[5%] left-[55%] h-[65%] w-auto group z-20">
                       <img src={IMG_NPC_SOL} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
                   </div>
-                  <div className="absolute bottom-[5%] right-[5%] h-[65%] w-auto group z-20">
+                  <div onClick={() => setActiveModal('newspaper_fish')} className="absolute bottom-[5%] right-[5%] h-[65%] w-auto cursor-pointer group z-20">
                       <img src={IMG_NPC_FISH} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
                   </div>
               </div>
@@ -1773,7 +1774,7 @@
                  <MapIcon size={20} /> <span className="tracking-widest text-sm uppercase">{t.backMap}</span>
               </button>
 
-              {activeModal && activeModal !== 'newspaper' && (
+              {activeModal && activeModal !== 'newspaper_bird' && activeModal !== 'newspaper_fish' && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => { setActiveModal(null); setDetailLog(null); }}>
                    <div className="relative w-[750px] max-w-[90vw] h-[600px] max-h-[85vh] bg-[#f0e6d2] shadow-[0_0_50px_rgba(0,0,0,1)] p-12 flex flex-col items-center animate-fade-in-up border-4 border-[#5c4a3d] overflow-hidden" onClick={e => e.stopPropagation()} style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/old-mathematics.png")', backgroundBlendMode: 'multiply' }}>
                       <button onClick={() => { setActiveModal(null); setDetailLog(null); }} className="absolute top-4 right-4 text-[#4a3b32] hover:scale-110 z-50"><X/></button>
@@ -1879,11 +1880,13 @@
                 </div>
               )}
 
-               {activeModal === 'newspaper' && (
+               {(activeModal === 'newspaper_bird' || activeModal === 'newspaper_fish') && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setActiveModal(null)}>
                    <div className="relative max-w-4xl w-full max-h-[90vh] bg-[#e5e5e5] shadow-2xl animate-unfold overflow-hidden" onClick={e => e.stopPropagation()}>
                       <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 z-50 bg-black text-white p-2 rounded-full"><X/></button>
-                      <div className="w-full h-full overflow-y-auto custom-scrollbar"><img src={IMG_NEWSPAPER} className="w-full h-auto block" /></div>
+                      <div className="w-full h-full overflow-y-auto custom-scrollbar">
+                        <img src={activeModal === 'newspaper_bird' ? IMG_NEWSPAPER_BIRD : IMG_NEWSPAPER_FISH} className="w-full h-auto block" />
+                      </div>
                    </div>
                 </div>
               )}
