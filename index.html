@@ -1882,9 +1882,9 @@
 
                {(activeModal === 'newspaper_bird' || activeModal === 'newspaper_fish') && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setActiveModal(null)}>
-                   <div className="relative max-w-4xl w-full max-h-[90vh] bg-[#e5e5e5] shadow-2xl animate-unfold overflow-hidden" onClick={e => e.stopPropagation()}>
-                      <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 z-50 bg-black text-white p-2 rounded-full"><X/></button>
-                      <div className="w-full h-full overflow-y-auto custom-scrollbar">
+                   <div className="relative max-w-4xl w-full max-h-[90vh] bg-[#e5e5e5] shadow-2xl animate-unfold flex flex-col" onClick={e => e.stopPropagation()}>
+                      <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 z-50 bg-black text-white p-2 rounded-full hover:scale-110 transition-transform"><X/></button>
+                      <div className="flex-1 w-full overflow-y-auto custom-scrollbar">
                         <img src={activeModal === 'newspaper_bird' ? IMG_NEWSPAPER_BIRD : IMG_NEWSPAPER_FISH} className="w-full h-auto block" />
                       </div>
                    </div>
@@ -1897,7 +1897,7 @@
         function App() {
           const [phase, setPhase] = useState('invitation');
           const [userTrait, setUserTrait] = useState(''); 
-          const [lang, setLang] = useState('zh'); 
+          const [lang, setLang] = useState('en'); 
           const [allCharacters, setAllCharacters] = useState([]); 
           const [currentUser, setCurrentUser] = useState(null);
           const [activeCharId, setActiveCharId] = useState(null);
@@ -1943,7 +1943,7 @@
           
           return (
             <div className="w-full h-screen font-serif selection:bg-[#78350f] selection:text-[#fffbf2]">
-              <button onClick={() => setLang(prev => prev === 'zh' ? 'en' : 'zh')} className="fixed top-6 right-8 z-[100] px-4 py-2 bg-[#292524] text-[#dcd0bb] border border-[#78350f] font-serif text-xs font-bold tracking-widest hover:bg-[#78350f] hover:text-white transition-colors shadow-lg flex items-center gap-2"><Globe size={14} /> {lang === 'zh' ? 'EN' : '中'}</button>
+              <button onClick={() => setLang(prev => prev === 'zh' ? 'en' : 'zh')} className="fixed top-24 right-8 z-[100] px-4 py-2 bg-[#292524] text-[#dcd0bb] border border-[#78350f] font-serif text-xs font-bold tracking-widest hover:bg-[#78350f] hover:text-white transition-colors shadow-lg flex items-center gap-2"><Globe size={14} /> {lang === 'zh' ? 'EN' : '中'}</button>
               {phase === 'invitation' && <InvitationPhase onEnter={handleEnterWorld} lang={lang} />}
               {phase === 'map' && <WorldMapPhase onGoHome={() => setPhase('home')} lang={lang} userChars={allCharacters} />}
               {phase === 'home' && <HomeSanctuaryPhase onBackMap={() => setPhase('map')} userTrait={userTrait} lang={lang} activeChar={activeCharacter} onOpenCreator={() => setShowCreator(true)} myCharacters={myCharacters} setActiveChar={(char) => setActiveCharId(char.id)} />}
