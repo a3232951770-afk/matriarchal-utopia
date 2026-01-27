@@ -1210,7 +1210,7 @@
         // 🎨 Character Creator
         // ============================================================================
 
-        const CharacterCreator = ({ onClose, onFinish, lang }) => {
+        const CharacterCreator = ({ onClose, onFinish, lang, existingCharacters = [] }) => {
             const [step, setStep] = useState(1);
             const [formData, setFormData] = useState({ nation: null, gender: 'female', bodyShape: null, name: '', backstory: '', location: '' });
             const [fabricCanvas, setFabricCanvas] = useState(null);
@@ -1314,10 +1314,54 @@
                 
                 try {
                     const nationBase = nations[formData.nation];
-                    let offsetX = (Math.random() - 0.5) * 20; 
-                    let offsetY = (Math.random() - 0.5) * 20;
-                    if (Math.abs(offsetX) < 5) offsetX = offsetX > 0 ? 5 : -5; 
-                    if (Math.abs(offsetY) < 5) offsetY = offsetY > 0 ? 5 : -5;
+                    let finalX, finalY;
+                    
+                    const obstacles = [
+                        {x: nationBase.x, y: nationBase.y}, // Nation center
+                        ...Object.values(nations).filter(n => n.id !== formData.nation).map(n => ({x: n.x, y: n.y})), // Other nations
+                        ...(getNpcPins(lang).map(n => ({x: n.x, y: n.y}))), // NPCs
+                        ...(existingCharacters || []).map(c => ({x: c.x, y: c.y})) // Existing Users
+                    ];
+
+                    let found = false;
+                    for(let i=0; i<50; i++) {
+                        // Generate position around nation with random radius between 6 and 22
+                        const r = 6 + Math.random() * 16; 
+                        const theta = Math.random() * 2 * Math.PI;
+                        let tx = nationBase.x + r * Math.cos(theta);
+                        let ty = nationBase.y + r * Math.sin(theta);
+                        
+                        // Keep within map main area (10-90%)
+                        tx = Math.max(10, Math.min(90, tx));
+                        ty = Math.max(10, Math.min(90, ty));
+
+                        // Collision checking (5% buffer)
+                        let collision = false;
+                        for(let obs of obstacles) {
+                            const dist = Math.sqrt((tx - obs.x)**2 + (ty - obs.y)**2);
+                            if(dist < 5) { 
+                                collision = true;
+                                break;
+                            }
+                        }
+                        
+                        if(!collision) {
+                            finalX = tx;
+                            finalY = ty;
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(!found) {
+                        // Fallback logic if too crowded
+                        let offsetX = (Math.random() - 0.5) * 20; 
+                        let offsetY = (Math.random() - 0.5) * 20;
+                        if (Math.abs(offsetX) < 5) offsetX = offsetX > 0 ? 5 : -5; 
+                        if (Math.abs(offsetY) < 5) offsetY = offsetY > 0 ? 5 : -5;
+                        finalX = Math.max(10, Math.min(90, nationBase.x + offsetX));
+                        finalY = Math.max(10, Math.min(90, nationBase.y + offsetY));
+                    }
                     
                     const user = auth.currentUser;
                     if (!user) {
@@ -1335,8 +1379,8 @@
                         nationName: nationBase.name,
                         createdAt: new Date().toISOString(),
                         userId: user.uid,
-                        x: Math.max(5, Math.min(95, nationBase.x + offsetX)),
-                        y: Math.max(5, Math.min(95, nationBase.y + offsetY)),
+                        x: finalX,
+                        y: finalY,
                     };
 
                     await db.collection('characters').add(newChar);
@@ -1947,7 +1991,7 @@
               {phase === 'invitation' && <InvitationPhase onEnter={handleEnterWorld} lang={lang} />}
               {phase === 'map' && <WorldMapPhase onGoHome={() => setPhase('home')} lang={lang} userChars={allCharacters} />}
               {phase === 'home' && <HomeSanctuaryPhase onBackMap={() => setPhase('map')} userTrait={userTrait} lang={lang} activeChar={activeCharacter} onOpenCreator={() => setShowCreator(true)} myCharacters={myCharacters} setActiveChar={(char) => setActiveCharId(char.id)} />}
-              {showCreator && <CharacterCreator lang={lang} onClose={() => setShowCreator(false)} onFinish={handleCharFinish} />}
+              {showCreator && <CharacterCreator lang={lang} onClose={() => setShowCreator(false)} onFinish={handleCharFinish} existingCharacters={allCharacters} />}
              </div>
           );
         }
