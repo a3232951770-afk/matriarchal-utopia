@@ -154,7 +154,11 @@
                 f9: "https://i.postimg.cc/Zqr0wrN9/图层_9.png",
                 f10: "https://i.postimg.cc/fbxk8xdm/图层_10.png",
                 f11: "https://i.postimg.cc/QMpVfp77/图层_11.png",
-                f12: "https://i.postimg.cc/5twjswzQ/图层_12.png"
+                f12: "https://i.postimg.cc/5twjswzQ/图层_12.png",
+                f13: "https://i.postimg.cc/Gt34RmFx/肌肉1.png",
+                f14: "https://i.postimg.cc/2yj1YSQQ/肌肉2.png",
+                f15: "https://i.postimg.cc/prVmvLfY/肌肉3.png",
+                f16: "https://i.postimg.cc/J07s8zNQ/肌肉4.png"
             },
             male: {
                 m12: "https://i.postimg.cc/5twjswzQ/图层_12.png",
@@ -1210,7 +1214,7 @@
         // 🎨 Character Creator
         // ============================================================================
 
-        const CharacterCreator = ({ onClose, onFinish, lang }) => {
+        const CharacterCreator = ({ onClose, onFinish, lang, existingCharacters = [] }) => {
             const [step, setStep] = useState(1);
             const [formData, setFormData] = useState({ nation: null, gender: 'female', bodyShape: null, name: '', backstory: '', location: '' });
             const [fabricCanvas, setFabricCanvas] = useState(null);
@@ -1314,10 +1318,62 @@
                 
                 try {
                     const nationBase = nations[formData.nation];
-                    let offsetX = (Math.random() - 0.5) * 20; 
-                    let offsetY = (Math.random() - 0.5) * 20;
-                    if (Math.abs(offsetX) < 5) offsetX = offsetX > 0 ? 5 : -5; 
-                    if (Math.abs(offsetY) < 5) offsetY = offsetY > 0 ? 5 : -5;
+                    let finalX, finalY;
+                    
+                    const obstacles = [
+                        {x: nationBase.x, y: nationBase.y}, // Nation center
+                        ...Object.values(nations).filter(n => n.id !== formData.nation).map(n => ({x: n.x, y: n.y})), // Other nations
+                        ...(getNpcPins(lang).map(n => ({x: n.x, y: n.y}))), // NPCs
+                        ...(existingCharacters || []).map(c => ({x: c.x, y: c.y})) // Existing Users
+                    ];
+
+                    let found = false;
+                    // Attempt 150 times to find a non-overlapping spot
+                    for(let i=0; i<150; i++) {
+                        // Generate position around nation with random radius (slightly increased range)
+                        const r = 8 + Math.random() * 18; 
+                        const theta = Math.random() * 2 * Math.PI;
+                        let tx = nationBase.x + r * Math.cos(theta);
+                        let ty = nationBase.y + r * Math.sin(theta);
+                        
+                        // Keep within map main area (10-90%)
+                        tx = Math.max(10, Math.min(90, tx));
+                        ty = Math.max(10, Math.min(90, ty));
+
+                        // Collision checking (Rectangular box)
+                        // Ensure vertical distance > image height + buffer (~14%)
+                        // Ensure horizontal distance > image width + buffer (~6%)
+                        const SAFE_W = 6;  
+                        const SAFE_H = 14; 
+                        
+                        let collision = false;
+                        for(let obs of obstacles) {
+                            const dx = Math.abs(tx - obs.x);
+                            const dy = Math.abs(ty - obs.y);
+                            
+                            // If strictly within the 'box' of another character, it's a collision
+                            if(dx < SAFE_W && dy < SAFE_H) { 
+                                collision = true;
+                                break;
+                            }
+                        }
+                        
+                        if(!collision) {
+                            finalX = tx;
+                            finalY = ty;
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(!found) {
+                        console.warn("Could not find collision-free spot, using fallback.");
+                        // Fallback: wider spread if too crowded
+                        let offsetX = (Math.random() - 0.5) * 30; 
+                        let offsetY = (Math.random() - 0.5) * 30;
+                        finalX = Math.max(10, Math.min(90, nationBase.x + offsetX));
+                        finalY = Math.max(10, Math.min(90, nationBase.y + offsetY));
+                    }
                     
                     const user = auth.currentUser;
                     if (!user) {
@@ -1335,8 +1391,8 @@
                         nationName: nationBase.name,
                         createdAt: new Date().toISOString(),
                         userId: user.uid,
-                        x: Math.max(5, Math.min(95, nationBase.x + offsetX)),
-                        y: Math.max(5, Math.min(95, nationBase.y + offsetY)),
+                        x: finalX,
+                        y: finalY,
                     };
 
                     await db.collection('characters').add(newChar);
