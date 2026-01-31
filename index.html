@@ -1369,9 +1369,7 @@
                             tx = Math.max(10, Math.min(90, tx));
                             ty = Math.max(10, Math.min(90, ty));
 
-                            // Collision checking (Rectangular box)
-                            // Ensure vertical distance > image height + buffer (~14%)
-                            // Ensure horizontal distance > image width + buffer (~6%)
+                            // Collision checking
                             const SAFE_W = 6;  
                             const SAFE_H = 14; 
                             
@@ -1380,7 +1378,6 @@
                                 const dx = Math.abs(tx - obs.x);
                                 const dy = Math.abs(ty - obs.y);
                                 
-                                // If strictly within the 'box' of another character, it's a collision
                                 if(dx < SAFE_W && dy < SAFE_H) { 
                                     collision = true;
                                     break;
@@ -1412,10 +1409,9 @@
                         return;
                     }
 
-                    const charId = initialData?.id || Date.now().toString();
-                    
+                    // DO NOT generate a manual ID here to put inside the object if it's a new create.
+                    // Firebase will generate one.
                     const newChar = {
-                        id: charId,
                         ...formData,
                         imageUrl: finalImage,
                         nationName: nationBase.name,
@@ -1425,14 +1421,18 @@
                         y: finalY,
                     };
 
+                    let savedId;
                     if (initialData && initialData.id) {
+                        // Use the real document ID for update
                         await db.collection('characters').doc(initialData.id).update(newChar);
+                        savedId = initialData.id;
                     } else {
-                        await db.collection('characters').add(newChar);
+                        const docRef = await db.collection('characters').add(newChar);
+                        savedId = docRef.id;
                     }
                     
-                    console.log("Character saved to Firebase.");
-                    onFinish(newChar);
+                    console.log("Character saved to Firebase.", savedId);
+                    onFinish({ ...newChar, id: savedId });
                 } catch (err) {
                     console.error("Save error", err);
                     alert("Failed to save character. Please try again.");
@@ -1605,7 +1605,7 @@
                                                 value={formData.backstory} 
                                                 onChange={e=>setFormData({...formData, backstory: e.target.value})} 
                                                 placeholder={t.storyPlaceholder} 
-                                                className="w-full h-48 bg-[#1c1917] border border-[#5c4a3d] p-3 focus:border-[#be123c] outline-none text-[#dcd0bb] whitespace-pre-wrap"
+                                                className="w-full h-48 bg-[#1c1917] border border-[#5c4a3d] p-3 focus:border-[#be123c] outline-none text-[#dcd0bb] whitespace-pre-wrap font-serif leading-relaxed"
                                              />
                                         </div>
                                          <button onClick={saveCharacter} disabled={!formData.name || isSaving} className="w-full py-4 bg-[#7f1d1d] text-white font-bold text-xl tracking-[0.2em] hover:bg-[#9f1239] disabled:opacity-50 shadow-xl mt-4">
@@ -1912,7 +1912,7 @@
                                                 </div>
                                             </div>
                                             <p className="mt-2 text-sm text-[#44403c] italic line-clamp-2">{char.location}</p>
-                                            <div className="mt-2 text-xs text-[#57534e] bg-[#292524]/5 p-2 rounded whitespace-pre-wrap max-h-20 overflow-hidden text-ellipsis">
+                                            <div className="mt-2 text-xs text-[#57534e] bg-[#292524]/5 p-2 rounded whitespace-pre-wrap max-h-20 overflow-hidden text-ellipsis font-serif leading-relaxed">
                                                 {char.backstory}
                                             </div>
                                         </div>
@@ -2060,7 +2060,9 @@
                   if (user) {
                       const unsubscribe = db.collection('characters')
                           .onSnapshot((snapshot) => {
-                              const chars = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                              // CRITICAL FIX: Spread doc.data() FIRST, then overwrite id with doc.id.
+                              // This ensures we use the Firestore Document ID as the key, not the internal timestamp ID.
+                              const chars = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
                               setAllCharacters(chars);
                               
                               const myChars = chars.filter(c => c.userId === user.uid);
