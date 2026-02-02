@@ -2082,6 +2082,21 @@
                    </div>
                 </div>
               )}
+              
+              {/* Mobile Tab Bar (Moved Here from App to fix reference error) */}
+              <div className="md:hidden fixed left-0 right-0 bottom-0 z-40 px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] pt-2">
+                <div className="grid grid-cols-4 gap-2 bg-[#292524]/75 backdrop-blur border border-white/10 rounded-2xl p-2 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+                  {[{id:'module1',label:t.module1,Icon:Eye},{id:'module2',label:t.module2,Icon:Activity},{id:'module3',label:t.module3,Icon:Heart},{id:'home',label:t.home,Icon:Home}].map(item=>(
+                    <button key={item.id}
+                      onClick={()=> item.id==='home' ? setActiveModal(null) : setActiveModal(item.id)}
+                      className={`flex flex-col items-center justify-center rounded-xl py-2 active:scale-95 transition-transform ${activeModal===item.id ? 'bg-[#fffbf2]/12 border border-white/15' : 'bg-transparent'}`}>
+                      <item.Icon size={18} className={`${activeModal===item.id ? 'text-[#fffbf2]' : 'text-[#dcd0bb]'}`} />
+                      <span className={`mt-1 text-[10px] tracking-widest uppercase ${activeModal===item.id ? 'text-[#fffbf2]' : 'text-[#dcd0bb]'}`}>{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
             </div>
            );
         }
@@ -2150,21 +2165,6 @@
           return (
             <div className="w-full h-screen font-serif selection:bg-[#78350f] selection:text-[#fffbf2]">
               
-              {/* Mobile Tab Bar */}
-              <div className="md:hidden fixed left-0 right-0 bottom-0 z-40 px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] pt-2">
-                <div className="grid grid-cols-4 gap-2 bg-[#292524]/75 backdrop-blur border border-white/10 rounded-2xl p-2 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
-                  {[{id:'module1',label:t.module1,Icon:Eye},{id:'module2',label:t.module2,Icon:Activity},{id:'module3',label:t.module3,Icon:Heart},{id:'home',label:t.home,Icon:Home}].map(item=>(
-                    <button key={item.id}
-                      onClick={()=> item.id==='home' ? setActiveModal(null) : setActiveModal(item.id)}
-                      className={`flex flex-col items-center justify-center rounded-xl py-2 active:scale-95 transition-transform ${activeModal===item.id ? 'bg-[#fffbf2]/12 border border-white/15' : 'bg-transparent'}`}>
-                      <item.Icon size={18} className={`${activeModal===item.id ? 'text-[#fffbf2]' : 'text-[#dcd0bb]'}`} />
-                      <span className={`mt-1 text-[10px] tracking-widest uppercase ${activeModal===item.id ? 'text-[#fffbf2]' : 'text-[#dcd0bb]'}`}>{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-
               <button onClick={() => setLang(prev => prev === 'zh' ? 'en' : 'zh')} className="fixed bottom-4 left-4 md:bottom-8 md:left-8 z-[100] px-3 py-2 md:px-4 bg-[#292524] text-[#dcd0bb] border border-[#78350f] font-serif text-[10px] md:text-xs font-bold tracking-widest hover:bg-[#78350f] hover:text-white transition-colors shadow-lg flex items-center gap-2 pb-[env(safe-area-inset-bottom)]"><Globe size={14} /> {lang === 'zh' ? 'EN' : '中'}</button>
               {phase === 'invitation' && <InvitationPhase onEnter={handleEnterWorld} lang={lang} />}
               {phase === 'map' && <WorldMapPhase onGoHome={() => setPhase('home')} lang={lang} userChars={allCharacters} />}
