@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Matriarchal Utopia - World Invitation & Creation</title>
     
     <!-- React & ReactDOM -->
@@ -25,7 +25,7 @@
 
     <!-- CSS Reset & Styles -->
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; background-color: #1c1917; font-family: 'Georgia', serif; }
+        body { margin: 0; padding: 0; overflow: hidden; background-color: #1c1917; font-family: 'Georgia', serif; touch-action: none; }
         .animate-unfold { animation: unfold 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-slide-up { animation: slideUp 0.5s ease-out forwards; }
         .animate-slide-left { animation: slideLeft 0.5s ease-out forwards; }
@@ -78,21 +78,19 @@
             measurementId: "G-0WJENQGEMN"
         };
 
-        // Initialize Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // Ensure anonymous auth for database access
         auth.onAuthStateChanged((user) => {
             if (!user) {
                 auth.signInAnonymously().catch(console.error);
             }
         });
 
-        const { useState, useRef, useEffect, useMemo } = React;
+        const { useState, useRef, useEffect, useMemo, useCallback } = React;
         
         // ============================================================================
         // 🔧 Icons
@@ -112,7 +110,7 @@
         const MapPin = (p) => <Icon {...p}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></Icon>;
         const ZoomIn = (p) => <Icon {...p}><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></Icon>;
         const ZoomOut = (p) => <Icon {...p}><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" x2="14" y1="11" y2="11"/></Icon>;
-        const Globe = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></Icon>;
+        const Globe = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></Icon>;
         const UserPlus = (p) => <Icon {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" x2="20" y1="8" y2="14"/><line x1="23" x2="17" y1="11" y2="11"/></Icon>;
         const User = (p) => <Icon {...p}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></Icon>;
         const MessageSquare = (p) => <Icon {...p}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></Icon>;
@@ -267,80 +265,6 @@
                         { id: 1, text: "你只负责记录？", reply: "倾听也是一种力量。在这个喧嚣的世界，愿意安静下来记录女性智慧的人太少了。我觉得我很荣幸。" },
                         { id: 2, text: "你不觉得无聊？", reply: "看着历史在眼前流过，怎么会无聊？我是第一个知道结局的人。这种安静的观察让我觉得……我很富有。" },
                         { id: 3, text: "她们在意你吗？", reply: "她们信任我的笔。这就够了。不需要聚光灯，灯塔的底座从不发光，但它举起了光。" }
-                    ]
-                }
-            },
-            en: {
-                'b1': {
-                    start: "Look at the feathers on the ground. Each one is a vow they made on stage. The boys are responsible for shining, and I am responsible for weaving that shine into a floor we can walk on.",
-                    options: [
-                        { id: 1, text: "Don't you find sweeping annoying?", reply: "Annoying? Perhaps. But if no one cleans up this beautiful nonsense, our nest would have collapsed long ago. I appreciate their effort, as long as they don't expect beauty alone to feed the children." },
-                        { id: 2, text: "Why watch them perform?", reply: "Because it is a contract. They display vulnerability and beauty; I display assessment and burden. In this nation, the one being watched is surrendering power, and the watcher, holding that power, must be benevolent." },
-                        { id: 3, text: "What do you value most?", reply: "Not who flies the highest, but who lands the steadiest. Only when the wind stops can you see who truly loves this home and who just loves the show." }
-                    ]
-                },
-                'b2': {
-                    start: "I spent three hours mixing this color. The Matriarch said last season's blue was too aggressive, so I added some greyscale. Does this look 'reliable' to you, or just 'vain'?",
-                    options: [
-                        { id: 1, text: "I think it's beautiful.", reply: "Thank you. But in Plumaria, beauty without function is waste. I hope my beauty makes her feel... that I am a partner who can weather the storm with her." },
-                        { id: 2, text: "Why care so much about their opinion?", reply: "Because their eyes are rulers. They can see if the muscle under the feather is taut. Listening to their critique makes me better. It's not submission; it's evolution." },
-                        { id: 3, text: "What if you aren't chosen?", reply: "Then I'll teach the chicks to fly. If I can't be the protagonist, being a good audience is also a contribution. Besides, this color makes me happy too." }
-                    ]
-                },
-                'b3': {
-                    start: "Tea? That boy who just came down is crying loudly. He thought if his heart was sincere enough, the wind would change. Sadly, love, like physics, doesn't run on sentiment.",
-                    options: [
-                        { id: 1, text: "Will you comfort him?", reply: "I won't lie to him. I'll tell him: 'Your feathers are beautiful, just not for this tree.' Kindness between women isn't lying; it's telling the truth and then pouring hot tea." },
-                        { id: 2, text: "Is it always this cruel?", reply: "Choice is always cruel. But not choosing is crueler—that is irresponsible to everyone. We select so the next generation has better wings. It's not personal." },
-                        { id: 3, text: "What about you?", reply: "Me? I'm the one dimming the lights backstage. So the winners aren't too proud, and the losers aren't too embarrassed. That's a form of 'care', isn't it?" }
-                    ]
-                },
-                'h1': {
-                    start: "You're standing in a blind spot. If there's an attack, you'll be the first breach. Move three steps left. We don't protect each other with hugs; we protect with positioning.",
-                    options: [
-                        { id: 1, text: "That's too strict.", reply: "Relaxation is a privilege for the dead. In this nation, 'love' means I won't allow you to die from a mistake. My strictness is your survival guarantee." },
-                        { id: 2, text: "Does everyone listen to you?", reply: "They listen to 'logic'. If ignoring me improved efficiency by 1%, I'd shut up and step aside immediately. There are no queens here, only optimal solutions." },
-                        { id: 3, text: "Aren't you tired?", reply: "The system doesn't need the emotion of 'tired'. It needs lubricant. As long as the defense line is intact, I don't feel tired." }
-                    ]
-                },
-                'h2': {
-                    start: "...Pressure dropped. Storm in ten minutes. My knees knew before the radar. Do you need cover?",
-                    options: [
-                        { id: 1, text: "How did you know?", reply: "The body is the best sensor. Many ignore bodily noise, but in Riftmark, we train the body into a precision instrument. Pain is a signal, not torture." },
-                        { id: 2, text: "You seem cold.", reply: "Because excess emotion interferes with signal reception. I'm not uncaring; I'm calculating the joules needed to drag you to safety. That is my way of caring." },
-                        { id: 3, text: "What is your gender?", reply: "I am a 'Warrior', I am an 'Early Warning System'. In the face of survival, gender labels are redundant decorations. You should throw yours away too; you'll run faster." }
-                    ]
-                },
-                'h3': {
-                    start: "Shh. Don't speak. Look at the Commander, she's adjusting her breathing. I learned one thing: when women are silent, they are usually making a massive decision. I just need to hand over the ammo.",
-                    options: [
-                        { id: 1, text: "Do you feel insignificant?", reply: "No. A gear is part of the machine. I don't need to be the brain; being a flexible hand is fulfilling. They steer, and I ensure the direction is safe." },
-                        { id: 2, text: "Are you afraid of them?", reply: "It's reverence. They bear the pressure of decision-making—the heaviest burden. I respect anyone who dares to be responsible for the outcome." },
-                        { id: 3, text: "Ever thought of leaving?", reply: "To where? Places full of lies? It's cold and hard here, but it's real. As long as I am useful, I have dignity. That is fair." }
-                    ]
-                },
-                'o1': {
-                    start: "Young ones want to forget pain, thinking it a burden. But I keep this scar because it records the tsunami fifty years ago. Forget it, and my children will drown in the same waters.",
-                    options: [
-                        { id: 1, text: "Memory is too heavy.", reply: "In this nation, memory is buoyancy. It keeps us from sinking. As an elder, my duty is to carry this weight so you can swim a bit lighter." },
-                        { id: 2, text: "Do you hold grudges?", reply: "I remember harm to avoid repeating it, but that isn't hate. Hate consumes energy; memory stores it. We are pragmatic." },
-                        { id: 3, text: "What about the future?", reply: "The future is just an echo of the past. Only those who hear the past clearly can see the future. Come, sit. Let me tell you the story of this reef." }
-                    ]
-                },
-                'o2': {
-                    start: "I dreamt I recited the genealogy wrong last night. Woke up in a cold sweat. If I break the chain, a thousand years of wisdom is lost. Do you understand that fear?",
-                    options: [
-                        { id: 1, text: "Why not write it down?", reply: "Paper rots in water, stone wears smooth. Only what is carved in the brain flows with the blood. This is how we love the world—by remembering it." },
-                        { id: 2, text: "You can rest.", reply: "Grandmother Mu La is sixty and still remembering. She hasn't rested; how dare I? But I'm learning to weave stories into songs. It's less heavy when sung." },
-                        { id: 3, text: "Is it worth it?", reply: "When you see a calf avoid a trap you remembered, you feel it is all worth it. We are vessels of time. It is sacred." }
-                    ]
-                },
-                'o3': {
-                    start: "The Matriarch spoke for four hours today. My hand cramped twice, but I didn't stop. Her words might not be understood for fifty years; my task is ensuring they are still there when that time comes.",
-                    options: [
-                        { id: 1, text: "You only record?", reply: "Listening is also a power. In this noisy world, few are willing to quietly record female wisdom. I feel honored." },
-                        { id: 2, text: "Isn't it boring?", reply: "Watching history flow before my eyes? How could it be? I am the first to know the ending. This quiet observation makes me feel... wealthy." },
-                        { id: 3, text: "Do they care about you?", reply: "They trust my pen. That is enough. No need for a spotlight; the base of the lighthouse never shines, but it holds up the light." }
                     ]
                 }
             }
@@ -1241,12 +1165,10 @@
             const t = TEXT[selectedLang].ui;
             const nations = getNations(lang);
 
-            // Load initial data for editing
             useEffect(() => {
                 if (initialData) {
                     setFormData({ ...initialData });
                     setFinalImage(initialData.imageUrl);
-                    // Jump to text editing step if editing
                     setStep(7);
                 }
             }, [initialData]);
@@ -1345,45 +1267,35 @@
                     let finalX, finalY;
                     
                     if (initialData && initialData.x && initialData.y) {
-                         // Keep position if editing
                          finalX = initialData.x;
                          finalY = initialData.y;
                     } else {
                         const obstacles = [
-                            {x: nationBase.x, y: nationBase.y}, // Nation center
-                            ...Object.values(nations).filter(n => n.id !== formData.nation).map(n => ({x: n.x, y: n.y})), // Other nations
-                            ...(getNpcPins(lang).map(n => ({x: n.x, y: n.y}))), // NPCs
-                            ...(existingCharacters || []).map(c => ({x: c.x, y: c.y})) // Existing Users
+                            {x: nationBase.x, y: nationBase.y}, 
+                            ...Object.values(nations).filter(n => n.id !== formData.nation).map(n => ({x: n.x, y: n.y})), 
+                            ...(getNpcPins(lang).map(n => ({x: n.x, y: n.y}))), 
+                            ...(existingCharacters || []).map(c => ({x: c.x, y: c.y}))
                         ];
 
                         let found = false;
-                        // Attempt 150 times to find a non-overlapping spot
                         for(let i=0; i<150; i++) {
-                            // Generate position around nation with random radius (slightly increased range)
                             const r = 8 + Math.random() * 18; 
                             const theta = Math.random() * 2 * Math.PI;
                             let tx = nationBase.x + r * Math.cos(theta);
                             let ty = nationBase.y + r * Math.sin(theta);
-                            
-                            // Keep within map main area (10-90%)
                             tx = Math.max(10, Math.min(90, tx));
                             ty = Math.max(10, Math.min(90, ty));
-
-                            // Collision checking
                             const SAFE_W = 6;  
                             const SAFE_H = 14; 
-                            
                             let collision = false;
                             for(let obs of obstacles) {
                                 const dx = Math.abs(tx - obs.x);
                                 const dy = Math.abs(ty - obs.y);
-                                
                                 if(dx < SAFE_W && dy < SAFE_H) { 
                                     collision = true;
                                     break;
                                 }
                             }
-                            
                             if(!collision) {
                                 finalX = tx;
                                 finalY = ty;
@@ -1393,8 +1305,6 @@
                         }
 
                         if(!found) {
-                            console.warn("Could not find collision-free spot, using fallback.");
-                            // Fallback: wider spread if too crowded
                             let offsetX = (Math.random() - 0.5) * 30; 
                             let offsetY = (Math.random() - 0.5) * 30;
                             finalX = Math.max(10, Math.min(90, nationBase.x + offsetX));
@@ -1409,8 +1319,6 @@
                         return;
                     }
 
-                    // DO NOT generate a manual ID here to put inside the object if it's a new create.
-                    // Firebase will generate one.
                     const newChar = {
                         ...formData,
                         imageUrl: finalImage,
@@ -1423,7 +1331,6 @@
 
                     let savedId;
                     if (initialData && initialData.id) {
-                        // Use the real document ID for update
                         await db.collection('characters').doc(initialData.id).update(newChar);
                         savedId = initialData.id;
                     } else {
@@ -1431,7 +1338,6 @@
                         savedId = docRef.id;
                     }
                     
-                    console.log("Character saved to Firebase.", savedId);
                     onFinish({ ...newChar, id: savedId });
                 } catch (err) {
                     console.error("Save error", err);
@@ -1442,18 +1348,17 @@
             };
 
             return (
-                <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 font-serif text-[#dcd0bb]">
-                    <div className="w-[95vw] h-[90vh] bg-[#292524] border-2 border-[#7f1d1d] flex flex-col relative shadow-[0_0_50px_rgba(127,29,29,0.3)]">
-                        <button onClick={onClose} className="absolute top-4 right-4 z-50 hover:text-white"><X/></button>
+                <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-0 md:p-4 font-serif text-[#dcd0bb]">
+                    <div className="w-full h-full md:w-[95vw] md:h-[90vh] bg-[#292524] border-0 md:border-2 border-[#7f1d1d] flex flex-col relative shadow-[0_0_50px_rgba(127,29,29,0.3)]">
+                        <button onClick={onClose} className="absolute top-4 right-4 z-50 hover:text-white bg-black/20 p-2 rounded-full md:bg-transparent md:p-0"><X/></button>
                         
-                        <div className="p-4 border-b border-[#5c4a3d] bg-[#1c1917] text-center flex justify-between items-center px-8">
+                        <div className="p-4 border-b border-[#5c4a3d] bg-[#1c1917] text-center flex justify-between items-center px-4 md:px-8">
                             <span className="text-xs text-[#78350f] uppercase tracking-widest">Step {step} / 7</span>
                              <h2 className="text-xl font-bold tracking-widest text-[#dcd0bb]">{t.creatorTitle}</h2>
                             <div className="w-10"></div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center relative">
-                             {/* Flag Hover Overlay */}
+                        <div className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center relative">
                              {hoverFlag && (
                                 <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] animate-unfold pointer-events-none">
                                     <img src={hoverFlag} className="w-[60vw] max-w-[500px] h-auto object-contain drop-shadow-[0_0_50px_rgba(0,0,0,0.8)]" />
@@ -1676,6 +1581,16 @@
             const [activeUserChar, setActiveUserChar] = useState(null);
             const [chatState, setChatState] = useState('bio'); 
             const [chatOption, setChatOption] = useState(null);
+            const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+            
+            // Touch state
+            const touchStart = useRef({ x: 0, y: 0, dist: 0, mode: null, initialScale: 1 });
+
+            useEffect(() => {
+                const handleResize = () => setIsMobile(window.innerWidth < 768);
+                window.addEventListener('resize', handleResize);
+                return () => window.removeEventListener('resize', handleResize);
+            }, []);
 
             const nations = useMemo(() => getNations(lang), [lang]);
             const npcs = useMemo(() => getNpcPins(lang), [lang]);
@@ -1694,78 +1609,109 @@
 
             const handleStartChat = () => { setChatState('intro'); setChatOption(null); };
             const handleOptionSelect = (opt) => { setChatOption(opt); setChatState('result'); };
+            
+            const handleTouchStart = (e) => {
+                if (e.touches.length === 1) {
+                    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, mode: 'drag' };
+                } else if (e.touches.length === 2) {
+                    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                    touchStart.current = { dist, mode: 'zoom', initialScale: scale };
+                }
+            };
+            
+            const handleTouchMove = (e) => {
+                if (e.cancelable) e.preventDefault(); 
+                if (e.touches.length === 1 && touchStart.current.mode === 'drag') {
+                    const dx = e.touches[0].clientX - touchStart.current.x;
+                    const dy = e.touches[0].clientY - touchStart.current.y;
+                    setPosition(p => ({ x: p.x + dx / scale, y: p.y + dy / scale }));
+                    touchStart.current.x = e.touches[0].clientX;
+                    touchStart.current.y = e.touches[0].clientY;
+                } else if (e.touches.length === 2 && touchStart.current.mode === 'zoom') {
+                    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                    const delta = dist / touchStart.current.dist;
+                    setScale(Math.max(0.2, Math.min(5, touchStart.current.initialScale * delta)));
+                }
+            };
 
             return (
-                <div className="relative w-full h-screen bg-[#1c1917] overflow-hidden font-serif flex items-center justify-center">
-                    <div className="relative w-full h-full cursor-move transition-transform duration-300 ease-out flex items-center justify-center" style={{ transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)` }} onMouseMove={(e) => { if(e.buttons === 1) setPosition(prev => ({x: prev.x + e.movementX / scale, y: prev.y + e.movementY / scale})); }}>
-                         <div className="relative h-full w-full flex items-center justify-center">
-                            <img src={IMG_MAP_BG} onError={(e) => { if(e.target.src !== IMG_MAP_BACKUP) { e.target.src = IMG_MAP_BACKUP; console.warn("Main map image failed, loading backup."); } }} crossOrigin="anonymous" className="max-w-full max-h-full object-contain shadow-2xl pointer-events-none" />
-                            <div className="absolute inset-0">
-                                 {Object.values(nations).map(n => (
-                                    <div key={n.id} onClick={(e) => {e.stopPropagation(); setActiveNation(n); setActiveLog(null); setActiveUserChar(null); setChatState('bio');}} className="absolute cursor-pointer group hover:-translate-y-2 transition-transform flex flex-col items-center z-30" style={{ left: `${n.x}%`, top: `${n.y}%` }}>
-                                         <MapPin className="text-[#7f1d1d] drop-shadow-xl fill-[#b91c1c] w-12 h-12" strokeWidth={1.5} />
-                                        <div className="absolute -bottom-6 bg-[#292524] text-[#dcd0bb] text-[12px] px-2 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">{n.name}</div>
-                                    </div>
-                                ))}
-                                {npcs.map(n => (
-                                     <div key={n.id} onClick={(e)=>{e.stopPropagation(); setActiveLog(n); setActiveNation(null); setActiveUserChar(null); setChatState('bio');}} className="absolute w-12 h-16 -ml-6 -mt-8 cursor-pointer group hover:scale-110 transition-transform z-20" style={{ left: `${n.x}%`, top: `${n.y}%` }}>
-                                        <div className="absolute inset-0 bg-white/40 blur-xl animate-pulse rounded-full opacity-50 group-hover:opacity-80"></div>
-                                         <img src={n.image} className="relative w-full h-full object-contain drop-shadow-lg filter hover:brightness-110 opacity-80" />
-                                    </div>
-                                ))}
-                                 {userChars.map(c => (
-                                    <div key={c.id} onClick={(e)=>{e.stopPropagation(); setActiveUserChar(c); setActiveNation(null); setActiveLog(null); setChatState('bio');}} className="absolute w-16 h-20 -ml-8 -mt-10 cursor-pointer group hover:scale-110 transition-transform z-20" style={{ left: `${c.x}%`, top: `${c.y}%` }}>
-                                         <div className="absolute -top-6 text-xs bg-[#7f1d1d] text-white px-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">{c.name}</div>
-                                         <img src={c.imageUrl} className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(127,29,29,0.8)] filter hover:brightness-110" />
-                                    </div>
-                                ))}
-                             </div>
+                <div 
+                    className="relative w-full h-screen bg-[#1c1917] overflow-hidden font-serif flex items-center justify-center touch-none"
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={() => touchStart.current.mode = null}
+                >
+                    <div 
+                        className="cursor-move transition-transform duration-100 ease-out origin-center flex items-center justify-center" 
+                        style={{ transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)` }} 
+                        onMouseMove={(e) => { if(e.buttons === 1) setPosition(prev => ({x: prev.x + e.movementX / scale, y: prev.y + e.movementY / scale})); }}
+                    >
+                        <div className="relative inline-block w-auto h-auto">
+                            <img src={IMG_MAP_BG} onError={(e) => { if(e.target.src !== IMG_MAP_BACKUP) { e.target.src = IMG_MAP_BACKUP; console.warn("Main map image failed, loading backup."); } }} crossOrigin="anonymous" className="max-w-none shadow-2xl pointer-events-none" style={{ height: '100vh', width: 'auto' }} />
+                            
+                            {Object.values(nations).map(n => (
+                                <div key={n.id} onClick={(e) => {e.stopPropagation(); setActiveNation(n); setActiveLog(null); setActiveUserChar(null); setChatState('bio');}} className="absolute cursor-pointer group hover:-translate-y-2 transition-transform flex flex-col items-center z-30" style={{ left: `${n.x}%`, top: `${n.y}%` }}>
+                                     <MapPin className="text-[#7f1d1d] drop-shadow-xl fill-[#b91c1c] w-8 h-8 md:w-12 md:h-12" strokeWidth={1.5} />
+                                    <div className={`absolute -bottom-6 bg-[#292524] text-[#dcd0bb] text-[10px] md:text-[12px] px-2 rounded opacity-0 ${!isMobile ? 'group-hover:opacity-100' : ''} whitespace-nowrap`}>{n.name}</div>
+                                </div>
+                            ))}
+                            {npcs.map(n => (
+                                 <div key={n.id} onClick={(e)=>{e.stopPropagation(); setActiveLog(n); setActiveNation(null); setActiveUserChar(null); setChatState('bio');}} className="absolute w-8 h-12 md:w-12 md:h-16 -ml-4 md:-ml-6 -mt-6 md:-mt-8 cursor-pointer group hover:scale-110 transition-transform z-20" style={{ left: `${n.x}%`, top: `${n.y}%` }}>
+                                    <div className="absolute inset-0 bg-white/40 blur-xl animate-pulse rounded-full opacity-50 group-hover:opacity-80"></div>
+                                     <img src={n.image} className="relative w-full h-full object-contain drop-shadow-lg filter hover:brightness-110 opacity-80" />
+                                </div>
+                            ))}
+                             {userChars.map(c => (
+                                <div key={c.id} onClick={(e)=>{e.stopPropagation(); setActiveUserChar(c); setActiveNation(null); setActiveLog(null); setChatState('bio');}} className="absolute w-12 h-16 md:w-16 md:h-20 -ml-6 md:-ml-8 -mt-8 md:-mt-10 cursor-pointer group hover:scale-110 transition-transform z-20" style={{ left: `${c.x}%`, top: `${c.y}%` }}>
+                                     <div className={`absolute -top-6 text-xs bg-[#7f1d1d] text-white px-1 rounded opacity-0 ${!isMobile ? 'group-hover:opacity-100' : ''} whitespace-nowrap`}>{c.name}</div>
+                                     <img src={c.imageUrl} className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(127,29,29,0.8)] filter hover:brightness-110" />
+                                </div>
+                            ))}
                         </div>
                     </div>
                     {activeNation && (
-                        <div className="absolute top-0 right-0 h-full w-[450px] z-30 animate-slide-left flex flex-col shadow-2xl bg-[#dcd0bb] border-l-4 border-[#5c4a3d]" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/aged-paper.png")' }}>
+                        <div className="absolute top-0 right-0 h-full w-[450px] max-w-full z-30 animate-slide-left flex flex-col shadow-2xl bg-[#dcd0bb] border-l-4 border-[#5c4a3d]" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/aged-paper.png")' }}>
                             <button onClick={()=>setActiveNation(null)} className="absolute top-4 right-4 p-2 z-50 hover:bg-[#78350f] hover:text-white rounded"><X/></button>
                             {activeNation.flag && ( <img src={activeNation.flag} className={`absolute top-0 right-0 w-[350px] h-auto object-contain pointer-events-none rotate-12 mix-blend-multiply opacity-25`} /> )}
                             <div className="p-8 pt-12 border-b-2 border-[#5c4a3d]/30 bg-[#292524]/5 relative z-10">
-                                <div className="flex items-center gap-3"><h2 className="text-4xl font-bold text-[#292524] tracking-widest">{activeNation.name}</h2></div>
+                                <div className="flex items-center gap-3"><h2 className="text-3xl md:text-4xl font-bold text-[#292524] tracking-widest">{activeNation.name}</h2></div>
                                 <p className="text-sm text-[#78350f] font-bold mt-2">{activeNation.desc}</p>
                             </div>
                              <div className="flex-1 overflow-y-auto p-8 custom-scrollbar text-[#44403c] leading-relaxed relative z-10"><div dangerouslySetInnerHTML={{ __html: activeNation.content }} /></div>
                         </div>
                     )}
                     {activeLog && (
-                        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-[700px] animate-slide-up z-40">
-                            <div className="relative z-10 bg-[#f2e6d6] border-t-4 border-[#78350f] shadow-2xl flex overflow-visible" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cream-paper.png")' }}>
-                                <div className="absolute inset-0 overflow-hidden rounded-lg pointer-events-none z-0">
-                                    {getNationFlagForId(activeLog.id) && ( <img src={getNationFlagForId(activeLog.id)} className={`absolute top-1/2 right-10 -translate-y-1/2 h-auto opacity-20 mix-blend-multiply rotate-6 ${activeLog.id.startsWith('o') ? 'w-[250px]' : 'w-[300px]'}`} /> )}
-                                </div>
-                                <button onClick={()=>setActiveLog(null)} className="absolute top-2 right-2 hover:bg-[#78350f] hover:text-white rounded p-1 transition-colors z-50"><X size={18}/></button>
-                                <div className="w-48 relative flex-shrink-0 -mt-12 ml-4 self-end z-20">
-                                     <img src={activeLog.image} className="w-full h-auto max-h-[350px] object-contain object-bottom drop-shadow-xl pointer-events-none" style={{ marginBottom: '-2px' }} />
-                                </div>
-                                <div className="flex-1 p-6 pl-2 flex flex-col gap-4 relative z-10">
-                                    <div className="border-b border-[#78350f]/20 pb-2 flex justify-between items-end">
-                                        <div className="flex items-center gap-2"><h2 className="text-2xl font-bold text-[#292524] tracking-wider">{activeLog.name}</h2></div>
-                                        {chatState === 'bio' && ( <button onClick={handleStartChat} className="flex items-center gap-1 text-xs bg-[#78350f] text-[#fef3c7] px-3 py-1 rounded font-bold hover:bg-[#991b1b] shadow-sm"><MessageSquare size={12}/> {t.chat}</button> )}
-                                        {chatState !== 'bio' && ( <button onClick={()=>setChatState('bio')} className="text-xs text-[#5c4a3d] underline hover:text-[#78350f]">{t.backList}</button> )}
+                        isMobile ? (
+                            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-h-[85vh] z-50 animate-fade-in-up bg-[#f2e6d6] border-4 border-[#78350f] shadow-2xl flex flex-col rounded-lg overflow-hidden" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cream-paper.png")' }}>
+                                <button onClick={()=>setActiveLog(null)} className="absolute top-2 right-2 hover:bg-[#78350f] hover:text-white rounded p-1 transition-colors z-50"><X size={20}/></button>
+                                <div className="p-6 bg-[#fffbf2]/50 border-b border-[#78350f]/20 flex items-center gap-4">
+                                    <img src={activeLog.image} className="w-20 h-20 object-contain rounded-full border-2 border-[#78350f] bg-[#dcd0bb]/30" />
+                                    <div>
+                                        <h2 className="text-xl font-bold text-[#292524]">{activeLog.name}</h2>
+                                        <div className="text-xs text-[#be123c] font-bold">{activeLog.personality}</div>
                                     </div>
+                                </div>
+                                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-4">
                                     <div className="flex flex-wrap gap-2 text-xs font-mono text-[#5c4a3d]">
                                         <div className="bg-[#292524]/5 px-2 py-1 rounded border border-[#5c4a3d]/20"><span className="opacity-50 mr-1">{t.labelHeight}:</span>{activeLog.height}</div>
                                         <div className="bg-[#292524]/5 px-2 py-1 rounded border border-[#5c4a3d]/20"><span className="opacity-50 mr-1">{t.labelAge}:</span>{activeLog.age}</div>
                                         <div className="bg-[#292524]/5 px-2 py-1 rounded border border-[#5c4a3d]/20"><span className="opacity-50 mr-1">{t.labelGender}:</span>{activeLog.gender}</div>
                                         <div className="bg-[#292524]/5 px-2 py-1 rounded border border-[#5c4a3d]/20"><span className="opacity-50 mr-1">{t.labelStatus}:</span>{activeLog.relation}</div>
                                     </div>
-                                    <div className="text-xs text-[#be123c] font-bold"><span className="opacity-70 text-[#292524] mr-2">[{t.labelPersonality}]</span>{activeLog.personality}</div>
-                                    <div className="overflow-y-auto custom-scrollbar max-h-[150px] pr-2 min-h-[120px]">
-                                        {chatState === 'bio' && ( <p className="text-[#292524] text-sm leading-relaxed font-serif italic opacity-90 animate-fade-in-up">"{activeLog.log}"</p> )}
+                                    <div className="flex gap-2">
+                                         {chatState === 'bio' && ( <button onClick={handleStartChat} className="flex items-center gap-1 text-xs bg-[#78350f] text-[#fef3c7] px-3 py-1 rounded font-bold hover:bg-[#991b1b] shadow-sm"><MessageSquare size={12}/> {t.chat}</button> )}
+                                         {chatState !== 'bio' && ( <button onClick={()=>setChatState('bio')} className="text-xs text-[#5c4a3d] underline hover:text-[#78350f]">{t.backList}</button> )}
+                                    </div>
+                                    <div className="min-h-[100px]">
+                                        {chatState === 'bio' && ( <p className="text-[#292524] text-sm leading-relaxed font-serif italic opacity-90">"{activeLog.log}"</p> )}
                                         {chatState === 'intro' && dialogueData && (
-                                            <div className="animate-fade-in-up space-y-4">
+                                            <div className="space-y-4">
                                                 <div className="bg-[#fffbf2]/80 border-l-4 border-[#78350f] p-3 shadow-sm"><p className="text-[#292524] font-bold text-sm italic">"{dialogueData.start}"</p></div>
                                                 <div className="space-y-2">{dialogueData.options.map(opt => ( <button key={opt.id} onClick={() => handleOptionSelect(opt)} className="w-full text-left bg-[#f5f5f4] border border-[#d6d3d1] p-2 text-xs hover:bg-[#78350f] hover:text-[#fffbf2] hover:border-[#78350f] transition-all rounded shadow-sm flex items-center gap-2 group"><span className="opacity-50 group-hover:opacity-100">➤</span> {opt.text}</button> ))}</div>
                                             </div>
                                         )}
                                         {chatState === 'result' && chatOption && (
-                                            <div className="animate-fade-in-up space-y-3">
+                                            <div className="space-y-3">
                                                 <p className="text-[#5c4a3d] text-xs italic border-l-2 border-[#a8a29e] pl-2 mb-2 opacity-70">{t.dialogue.you}: {chatOption.text}</p>
                                                 <div className="bg-[#fffbf2]/90 border border-[#78350f]/20 p-3 rounded shadow-sm"><p className="text-[#78350f] font-bold text-sm leading-relaxed">"{chatOption.reply}"</p></div>
                                                 <button onClick={() => setChatState('bio')} className="text-xs mt-2 text-[#5c4a3d] hover:text-[#78350f] border-b border-transparent hover:border-[#78350f] transition-colors pb-0.5">{t.dialogue.end}</button>
@@ -1774,10 +1720,52 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-[700px] animate-slide-up z-40">
+                                <div className="relative z-10 bg-[#f2e6d6] border-t-4 border-[#78350f] shadow-2xl flex overflow-visible" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cream-paper.png")' }}>
+                                    <div className="absolute inset-0 overflow-hidden rounded-lg pointer-events-none z-0">
+                                        {getNationFlagForId(activeLog.id) && ( <img src={getNationFlagForId(activeLog.id)} className={`absolute top-1/2 right-10 -translate-y-1/2 h-auto opacity-20 mix-blend-multiply rotate-6 ${activeLog.id.startsWith('o') ? 'w-[250px]' : 'w-[300px]'}`} /> )}
+                                    </div>
+                                    <button onClick={()=>setActiveLog(null)} className="absolute top-2 right-2 hover:bg-[#78350f] hover:text-white rounded p-1 transition-colors z-50"><X size={18}/></button>
+                                    <div className="w-48 relative flex-shrink-0 -mt-12 ml-4 self-end z-20">
+                                         <img src={activeLog.image} className="w-full h-auto max-h-[350px] object-contain object-bottom drop-shadow-xl pointer-events-none" style={{ marginBottom: '-2px' }} />
+                                    </div>
+                                    <div className="flex-1 p-6 pl-2 flex flex-col gap-4 relative z-10">
+                                        <div className="border-b border-[#78350f]/20 pb-2 flex justify-between items-end">
+                                            <div className="flex items-center gap-2"><h2 className="text-2xl font-bold text-[#292524] tracking-wider">{activeLog.name}</h2></div>
+                                            {chatState === 'bio' && ( <button onClick={handleStartChat} className="flex items-center gap-1 text-xs bg-[#78350f] text-[#fef3c7] px-3 py-1 rounded font-bold hover:bg-[#991b1b] shadow-sm"><MessageSquare size={12}/> {t.chat}</button> )}
+                                            {chatState !== 'bio' && ( <button onClick={()=>setChatState('bio')} className="text-xs text-[#5c4a3d] underline hover:text-[#78350f]">{t.backList}</button> )}
+                                        </div>
+                                        <div className="flex flex-wrap gap-2 text-xs font-mono text-[#5c4a3d]">
+                                            <div className="bg-[#292524]/5 px-2 py-1 rounded border border-[#5c4a3d]/20"><span className="opacity-50 mr-1">{t.labelHeight}:</span>{activeLog.height}</div>
+                                            <div className="bg-[#292524]/5 px-2 py-1 rounded border border-[#5c4a3d]/20"><span className="opacity-50 mr-1">{t.labelAge}:</span>{activeLog.age}</div>
+                                            <div className="bg-[#292524]/5 px-2 py-1 rounded border border-[#5c4a3d]/20"><span className="opacity-50 mr-1">{t.labelGender}:</span>{activeLog.gender}</div>
+                                            <div className="bg-[#292524]/5 px-2 py-1 rounded border border-[#5c4a3d]/20"><span className="opacity-50 mr-1">{t.labelStatus}:</span>{activeLog.relation}</div>
+                                        </div>
+                                        <div className="text-xs text-[#be123c] font-bold"><span className="opacity-70 text-[#292524] mr-2">[{t.labelPersonality}]</span>{activeLog.personality}</div>
+                                        <div className="overflow-y-auto custom-scrollbar max-h-[150px] pr-2 min-h-[120px]">
+                                            {chatState === 'bio' && ( <p className="text-[#292524] text-sm leading-relaxed font-serif italic opacity-90 animate-fade-in-up">"{activeLog.log}"</p> )}
+                                            {chatState === 'intro' && dialogueData && (
+                                                <div className="animate-fade-in-up space-y-4">
+                                                    <div className="bg-[#fffbf2]/80 border-l-4 border-[#78350f] p-3 shadow-sm"><p className="text-[#292524] font-bold text-sm italic">"{dialogueData.start}"</p></div>
+                                                    <div className="space-y-2">{dialogueData.options.map(opt => ( <button key={opt.id} onClick={() => handleOptionSelect(opt)} className="w-full text-left bg-[#f5f5f4] border border-[#d6d3d1] p-2 text-xs hover:bg-[#78350f] hover:text-[#fffbf2] hover:border-[#78350f] transition-all rounded shadow-sm flex items-center gap-2 group"><span className="opacity-50 group-hover:opacity-100">➤</span> {opt.text}</button> ))}</div>
+                                                </div>
+                                            )}
+                                            {chatState === 'result' && chatOption && (
+                                                <div className="animate-fade-in-up space-y-3">
+                                                    <p className="text-[#5c4a3d] text-xs italic border-l-2 border-[#a8a29e] pl-2 mb-2 opacity-70">{t.dialogue.you}: {chatOption.text}</p>
+                                                    <div className="bg-[#fffbf2]/90 border border-[#78350f]/20 p-3 rounded shadow-sm"><p className="text-[#78350f] font-bold text-sm leading-relaxed">"{chatOption.reply}"</p></div>
+                                                    <button onClick={() => setChatState('bio')} className="text-xs mt-2 text-[#5c4a3d] hover:text-[#78350f] border-b border-transparent hover:border-[#78350f] transition-colors pb-0.5">{t.dialogue.end}</button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
                     )}
                     {activeUserChar && (
-                         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-[550px] animate-slide-up">
+                         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-[550px] max-w-[90vw] animate-slide-up">
                             <div className="relative z-10 bg-[#f2e6d6] border-4 border-[#78350f] rounded-lg p-6 pl-36 shadow-2xl min-h-[140px] flex flex-col justify-center" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cream-paper.png")' }}>
                                  <img src={activeUserChar.imageUrl} className="absolute bottom-0 left-[-20px] w-40 h-60 z-50 object-contain object-bottom pointer-events-none drop-shadow-2xl" />
                                 <button onClick={()=>setActiveUserChar(null)} className="absolute top-2 right-2"><X size={16}/></button>
@@ -1805,6 +1793,58 @@
           const [netPos, setNetPos] = useState({ x: 0, y: 0 });
           const [isDraggingNet, setIsDraggingNet] = useState(false);
           const [showProfile, setShowProfile] = useState(false);
+
+          // Mobile Viewport State
+          const [canvasScale, setCanvasScale] = useState(1);
+          const [canvasPos, setCanvasPos] = useState({ x: 0, y: 0 });
+          const touchStart = useRef({ x: 0, y: 0, dist: 0, mode: null, initialScale: 1 });
+          const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+          useEffect(() => {
+              const handleResize = () => setIsMobile(window.innerWidth < 768);
+              window.addEventListener('resize', handleResize);
+              return () => window.removeEventListener('resize', handleResize);
+          }, []);
+
+          useEffect(() => {
+              if (isMobile) {
+                  // For mobile, scale the 1920x1080 canvas to fit the HEIGHT of the phone
+                  const scale = window.innerHeight / 1080;
+                  setCanvasScale(scale);
+                  // Center horizontally initially
+                  const centerX = (window.innerWidth - 1920 * scale) / 2;
+                  setCanvasPos({ x: centerX, y: 0 });
+              }
+          }, [isMobile]);
+
+          // Touch logic for panning the "virtual" home canvas on mobile
+          const handleTouchStart = (e) => {
+                if (e.touches.length === 1) {
+                    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, mode: 'drag' };
+                } else if (e.touches.length === 2) {
+                    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                    touchStart.current = { dist, mode: 'zoom', initialScale: canvasScale };
+                }
+            };
+            
+            const handleTouchMove = (e) => {
+                if (!isMobile) return;
+                // preventDefault ensures the browser doesn't try to scroll the page
+                if (e.cancelable) e.preventDefault(); 
+                
+                if (e.touches.length === 1 && touchStart.current.mode === 'drag') {
+                    const dx = e.touches[0].clientX - touchStart.current.x;
+                    const dy = e.touches[0].clientY - touchStart.current.y;
+                    // Limit Y movement slightly but allow free X panning
+                    setCanvasPos(p => ({ x: p.x + dx, y: p.y + dy }));
+                    touchStart.current.x = e.touches[0].clientX;
+                    touchStart.current.y = e.touches[0].clientY;
+                } else if (e.touches.length === 2 && touchStart.current.mode === 'zoom') {
+                    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                    const delta = dist / touchStart.current.dist;
+                    setCanvasScale(Math.max(0.2, Math.min(3, touchStart.current.initialScale * delta)));
+                }
+            };
           
           const userNationId = TRAIT_KEYS[userTrait] || 'bird';
           const nations = useMemo(() => getNations(lang), [lang]);
@@ -1830,62 +1870,102 @@
               }
           };
 
-          return (
-            <div className="w-full h-screen relative bg-[#1c1917] overflow-hidden font-serif">
-              <div className="absolute inset-0">
-                <img src={IMG_HOME_BG} className="w-full h-full object-cover" alt="Home" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none"></div>
-               </div>
+          // Render Content: This is the shared structure for both desktop (static) and mobile (draggable)
+          const renderHomeContent = () => (
+              <>
+                  <img src={IMG_HOME_BG} className="absolute inset-0 w-full h-full object-cover pointer-events-none" alt="Home" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none"></div>
 
-              {/* OC Display Bar */}
-              <div className="absolute bottom-4 left-4 z-30 flex items-end gap-4 animate-fade-in-up">
-                  {myCharacters.map((char) => (
-                      <div key={char.id} className="group relative cursor-pointer hover:scale-110 transition-transform origin-bottom" onClick={() => setActiveChar(char)}>
-                          <img src={char.imageUrl} className="h-40 w-auto object-contain drop-shadow-2xl border-2 border-transparent bg-transparent rounded-lg"/>
-                          <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-[#292524]/90 text-[#dcd0bb] p-2 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-40 border border-[#5c4a3d]">
-                              <div className="font-bold">{char.name}</div>
-                              <div>{char.nationName}</div>
+                  {/* Character Showcase */}
+                  <div className="absolute bottom-4 left-4 z-30 flex items-end gap-4 animate-fade-in-up pointer-events-auto">
+                      {myCharacters.map((char) => (
+                          <div key={char.id} className="group relative cursor-pointer hover:scale-110 transition-transform origin-bottom" onClick={() => setActiveChar(char)}>
+                              <img src={char.imageUrl} className="h-40 w-auto object-contain drop-shadow-2xl border-2 border-transparent bg-transparent rounded-lg"/>
+                              <div className={`absolute -top-12 left-1/2 -translate-x-1/2 bg-[#292524]/90 text-[#dcd0bb] p-2 rounded text-xs opacity-0 ${!isMobile ? 'group-hover:opacity-100' : ''} transition-opacity pointer-events-none whitespace-nowrap z-40 border border-[#5c4a3d]`}>
+                                  <div className="font-bold">{char.name}</div>
+                                  <div>{char.nationName}</div>
+                              </div>
                           </div>
+                      ))}
+                  </div>
+
+                  <div className="absolute inset-0 z-10 pointer-events-none">
+                      <div onClick={() => setActiveModal('newspaper_bird')} className="absolute bottom-[5%] left-[5%] h-[65%] w-auto cursor-pointer group z-20 pointer-events-auto">
+                          <img src={IMG_NPC_BIRD} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
                       </div>
-                  ))}
-              </div>
+                      <div className="absolute bottom-[5%] left-[30%] h-[65%] w-auto group z-20">
+                          <img src={IMG_NPC_HORSE} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
+                      </div>
+                      <div className="absolute bottom-[5%] left-[55%] h-[65%] w-auto group z-20">
+                          <img src={IMG_NPC_SOL} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
+                      </div>
+                      <div onClick={() => setActiveModal('newspaper_fish')} className="absolute bottom-[5%] right-[5%] h-[65%] w-auto cursor-pointer group z-20 pointer-events-auto">
+                          <img src={IMG_NPC_FISH} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
+                      </div>
+                  </div>
+              </>
+          );
 
-              <button onClick={onOpenCreator} className="absolute bottom-8 right-8 z-30 bg-[#7f1d1d] text-[#dcd0bb] border-2 border-[#5c4a3d] px-6 py-3 rounded-sm font-bold shadow-xl hover:bg-[#991b1b] hover:scale-105 transition-all flex items-center gap-2 uppercase tracking-widest">
-                 <UserPlus size={20}/> {t.createChar}
-              </button>
-              
-              <button onClick={() => setShowProfile(true)} className="absolute top-10 right-10 z-30 bg-[#292524] text-[#dcd0bb] border border-[#5c4a3d] p-3 rounded-full hover:bg-[#78350f] transition-all shadow-lg">
-                  <User size={24}/>
-              </button>
-
-              <div className="absolute inset-0 z-10">
-                  <div onClick={() => setActiveModal('newspaper_bird')} className="absolute bottom-[5%] left-[5%] h-[65%] w-auto cursor-pointer group z-20">
-                      <img src={IMG_NPC_BIRD} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
-                  </div>
-                  <div className="absolute bottom-[5%] left-[30%] h-[65%] w-auto group z-20">
-                      <img src={IMG_NPC_HORSE} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
-                  </div>
-                  <div className="absolute bottom-[5%] left-[55%] h-[65%] w-auto group z-20">
-                      <img src={IMG_NPC_SOL} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
-                  </div>
-                  <div onClick={() => setActiveModal('newspaper_fish')} className="absolute bottom-[5%] right-[5%] h-[65%] w-auto cursor-pointer group z-20">
-                      <img src={IMG_NPC_FISH} className="w-full h-full object-contain drop-shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-300" />
-                  </div>
-              </div>
-
-              <div className="absolute top-10 left-1/2 -translate-x-1/2 flex gap-4 z-20">
-                {[ { id: 'module1', label: t.module1, icon: Eye }, { id: 'module2', label: t.module2, icon: Activity }, { id: 'module3', label: t.module3, icon: Heart } ].map(mod => (
-                  <button key={mod.id} onClick={() => setActiveModal(mod.id)} className="bg-[#fffbf2]/90 backdrop-blur border border-[#d4c5a9] px-6 py-3 rounded-sm shadow-lg flex items-center gap-2 text-[#4a3b32] hover:bg-[#78350f] hover:text-[#fffbf2] transition-colors">
-                     <mod.icon size={16} /> <span className="text-sm tracking-widest font-bold uppercase">{mod.label}</span>
+          // Fixed UI Buttons (Move out of scalable canvas for mobile, but keep inside for desktop)
+          const renderFixedUI = () => (
+              <>
+                  <button onClick={onOpenCreator} className={`absolute z-30 bg-[#7f1d1d] text-[#dcd0bb] border-2 border-[#5c4a3d] px-6 py-3 rounded-sm font-bold shadow-xl hover:bg-[#991b1b] hover:scale-105 transition-all flex items-center gap-2 uppercase tracking-widest pointer-events-auto ${isMobile ? "bottom-24 right-4" : "bottom-8 right-8"}`}>
+                     <UserPlus size={20}/> {t.createChar}
                   </button>
-                ))}
-              </div>
+                  
+                  <button onClick={() => setShowProfile(true)} className="absolute top-4 right-4 z-30 bg-[#292524] text-[#dcd0bb] border border-[#5c4a3d] p-3 rounded-full hover:bg-[#78350f] transition-all shadow-lg pointer-events-auto">
+                      <User size={24}/>
+                  </button>
 
-              <button onClick={onBackMap} className="absolute top-10 left-10 z-20 text-[#fffbf2] hover:text-[#fecaca] flex items-center gap-2 drop-shadow-md">
-                 <MapIcon size={20} /> <span className="tracking-widest text-sm uppercase">{t.backMap}</span>
-              </button>
+                  {/* Navigation Buttons: Fixed to TOP on Mobile, Top-Center on Desktop */}
+                  <div className={`absolute left-1/2 -translate-x-1/2 flex gap-2 z-20 pointer-events-auto w-full justify-center px-2 ${isMobile ? "top-16 flex-wrap" : "top-10"}`}>
+                    {[ { id: 'module1', label: t.module1, icon: Eye }, { id: 'module2', label: t.module2, icon: Activity }, { id: 'module3', label: t.module3, icon: Heart } ].map(mod => (
+                      <button key={mod.id} onClick={() => setActiveModal(mod.id)} className="bg-[#fffbf2]/90 backdrop-blur border border-[#d4c5a9] px-4 py-2 rounded-sm shadow-lg flex items-center gap-2 text-[#4a3b32] hover:bg-[#78350f] hover:text-[#fffbf2] transition-colors">
+                         <mod.icon size={16} /> <span className="text-[10px] md:text-sm tracking-widest font-bold uppercase">{mod.label}</span>
+                      </button>
+                    ))}
+                  </div>
 
-              {/* Profile Modal */}
+                  <button onClick={onBackMap} className="absolute top-4 left-4 z-20 text-[#fffbf2] hover:text-[#fecaca] flex items-center gap-2 drop-shadow-md pointer-events-auto bg-black/20 p-2 rounded md:bg-transparent md:p-0">
+                     <MapIcon size={20} /> <span className="tracking-widest text-sm uppercase">{t.backMap}</span>
+                  </button>
+              </>
+          );
+
+          return (
+            <div className="w-full h-screen relative bg-[#1c1917] overflow-hidden font-serif touch-none"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={() => touchStart.current.mode = null}
+            >
+              {!isMobile ? (
+                  /* Desktop: Static Full Screen Layout (Untouched) */
+                  <div className="absolute inset-0 w-full h-full">
+                      {renderHomeContent()}
+                      {renderFixedUI()}
+                  </div>
+              ) : (
+                  <>
+                    {/* Mobile: Virtual Canvas that can be dragged/zoomed */}
+                    <div 
+                        className="absolute origin-top-left transition-transform duration-75 ease-out"
+                        style={{ 
+                            transform: `translate(${canvasPos.x}px, ${canvasPos.y}px) scale(${canvasScale})`,
+                            width: '1920px', 
+                            height: '1080px',
+                            position: 'relative'
+                        }}
+                    >
+                        {renderHomeContent()}
+                    </div>
+                    {/* Fixed UI Overlay for Mobile */}
+                    <div className="absolute inset-0 pointer-events-none">
+                        {renderFixedUI()}
+                    </div>
+                  </>
+              )}
+
+              {/* Modals are Fixed Overlay */}
               {showProfile && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setShowProfile(false)}>
                     <div className="relative w-[800px] max-w-[90vw] h-[600px] bg-[#f0e6d2] shadow-2xl p-8 flex flex-col border-4 border-[#5c4a3d]" onClick={e => e.stopPropagation()} style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/aged-paper.png")' }}>
@@ -2060,8 +2140,6 @@
                   if (user) {
                       const unsubscribe = db.collection('characters')
                           .onSnapshot((snapshot) => {
-                              // CRITICAL FIX: Spread doc.data() FIRST, then overwrite id with doc.id.
-                              // This ensures we use the Firestore Document ID as the key, not the internal timestamp ID.
                               const chars = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
                               setAllCharacters(chars);
                               
@@ -2079,30 +2157,14 @@
                   }
               });
               return () => unsubscribeAuth();
-          }, []); // Effect runs once on mount, logic handles updates
+          }, []); 
 
           const handleEnterWorld = (trait) => { setUserTrait(trait); setPhase('map'); };
-          const handleCharFinish = (newChar) => { 
-              setActiveCharId(newChar.id); 
-              setShowCreator(false); 
-              setCreatorInitialData(null);
-          };
+          const handleCharFinish = (newChar) => { setActiveCharId(newChar.id); setShowCreator(false); setCreatorInitialData(null); };
+          const handleOpenCreator = () => { setCreatorInitialData(null); setShowCreator(true); };
+          const handleEditChar = (char) => { setCreatorInitialData(char); setShowCreator(true); };
 
-          const handleOpenCreator = () => {
-              setCreatorInitialData(null);
-              setShowCreator(true);
-          };
-
-          const handleEditChar = (char) => {
-              setCreatorInitialData(char);
-              setShowCreator(true);
-          };
-
-          const myCharacters = useMemo(() => {
-              if (!currentUser) return [];
-              return allCharacters.filter(c => c.userId === currentUser.uid);
-          }, [allCharacters, currentUser]);
-
+          const myCharacters = useMemo(() => { if (!currentUser) return []; return allCharacters.filter(c => c.userId === currentUser.uid); }, [allCharacters, currentUser]);
           const activeCharacter = myCharacters.find(c => c.id === activeCharId) || (myCharacters.length > 0 ? myCharacters[0] : null);
           
           return (
